@@ -49,6 +49,7 @@
       <button class="tab" data-tab="sensitivity">Sensitivity Analysis</button>
       <button class="tab" data-tab="cycle-time">Cycle Time Analysis</button>
       <button class="tab" data-tab="compare">Compare Scenarios</button>
+      <button class="tab" data-tab="scenario-manager">Scenario Manager</button>
     </div>
 
     <!-- Tab Content: Dashboard -->
@@ -221,6 +222,36 @@
         </div>
       </div>
     </div>
+
+    <!-- Tab Content: Scenario Manager -->
+    <div id="tab-scenario-manager" class="tab-content">
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>📁 Saved Scenarios Directory</span>
+          <button id="btnDeleteAllScenarios" class="btn btn-danger btn-sm">Delete All</button>
+        </div>
+        <div class="card-body">
+          <div id="scenario-list-container">
+            <p class="text-muted">Loading scenarios...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Import Scenario Section -->
+      <div class="card mt-2">
+        <div class="card-header">📥 Import Scenario from File</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Select JSON file to import:</label>
+            <input type="file" id="importScenarioFile" accept=".json" class="form-control" />
+          </div>
+          <button id="btnImportScenario" class="btn btn-primary">Import Scenario</button>
+          <p class="text-muted mt-1" style="font-size: 0.85rem;">
+            💡 Import previously exported scenario JSON files. A new ID will be assigned upon import.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Core Scripts -->
@@ -239,6 +270,7 @@
   <script src="js/ui/sensitivity.js"></script>
   <script src="js/ui/cycle-time.js"></script>
   <script src="js/ui/comparison.js"></script>
+  <script src="js/ui/scenario-manager.js"></script>
 
   <!-- Features -->
   <script src="js/features/export.js"></script>

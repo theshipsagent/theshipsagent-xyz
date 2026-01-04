@@ -60,6 +60,10 @@ const App = {
     document.getElementById('btnAddHQ')?.addEventListener('click', () => this.addLocation('hq'));
     document.getElementById('btnAddPortOffice')?.addEventListener('click', () => this.addLocation('port-office'));
     document.getElementById('btnAddVirtualSatellite')?.addEventListener('click', () => this.addLocation('virtual-satellite-office'));
+
+    // Scenario Manager controls
+    document.getElementById('btnDeleteAllScenarios')?.addEventListener('click', () => ScenarioManager.deleteAllScenarios());
+    document.getElementById('btnImportScenario')?.addEventListener('click', () => this.importScenarioFromFile());
   },
 
   /**
@@ -104,6 +108,11 @@ const App = {
     // Load corporate overhead when switching to corporate-overhead tab
     if (tabName === 'corporate-overhead' && this.currentScenario) {
       CorporateOverheadUI.render(this.currentScenario);
+    }
+
+    // Refresh scenario manager when switching to scenario-manager tab
+    if (tabName === 'scenario-manager') {
+      ScenarioManager.refreshScenarioList();
     }
   },
 
@@ -301,6 +310,64 @@ const App = {
       // Cancelled or invalid input
       return;
     }
+  },
+
+  /**
+   * Import scenario from JSON file
+   */
+  importScenarioFromFile() {
+    const fileInput = document.getElementById('importScenarioFile');
+    const file = fileInput?.files[0];
+
+    if (!file) {
+      alert('Please select a JSON file to import.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const jsonString = e.target.result;
+        const scenario = Storage.importScenario(jsonString);
+
+        if (!scenario) {
+          alert('Invalid scenario file. Please check the JSON format.');
+          return;
+        }
+
+        // Check scenario limit
+        const scenarios = Storage.getAllScenarios();
+        if (scenarios.length >= ScenarioManager.MAX_SCENARIOS) {
+          alert(`Cannot import scenario. Maximum limit is ${ScenarioManager.MAX_SCENARIOS} scenarios.\n\nPlease delete some scenarios first.`);
+          return;
+        }
+
+        // Save imported scenario
+        if (Storage.saveScenario(scenario)) {
+          console.log('Scenario imported:', scenario.name);
+
+          // Refresh dropdowns and scenario manager
+          this.loadScenarioDropdowns();
+          ScenarioManager.refreshScenarioList();
+
+          // Clear file input
+          fileInput.value = '';
+
+          alert(`Scenario "${scenario.name}" imported successfully!`);
+        } else {
+          alert('Error saving imported scenario.');
+        }
+      } catch (error) {
+        console.error('Import error:', error);
+        alert('Error reading file. Please ensure it is a valid JSON file.');
+      }
+    };
+
+    reader.onerror = () => {
+      alert('Error reading file.');
+    };
+
+    reader.readAsText(file);
   },
 
   /**
