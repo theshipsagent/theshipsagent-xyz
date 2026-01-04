@@ -1,0 +1,67 @@
+Ship Agency Financial Model - Overhead Detail
+
+OFFICE SPACE
+Item,Value
+Square Feet,5000
+Rent Class,class-b
+Cost per Sqft,$22.00
+Annual Rent,"$110,000.00"
+
+INSURANCE
+Type,Annual Cost
+Longshoremen,"$25,000.00"
+Errorsomissions,"$50,000.00"
+Generalliability,"$15,000.00"
+
+TECHNOLOGY
+System,Annual Cost
+Office365,"$3,600.00"
+Erpnetsuite,"$50,000.00"
+Crmdynamics,"$12,000.00"
+Specializedsaas,"$30,000.00"
+
+REGULATORY
+Item,Annual Cost
+Customsbond,"$15,000.00"
+Fmclicensing,"$5,000.00"
+
+PROFESSIONAL SERVICES
+Service,Annual Cost
+Legal,"$15,000.00"
+Accounting,"$25,000.00"
+Consulting,"$10,000.00"
+
+OFFICE OPERATIONS
+Item,Annual Cost
+Utilities,"$12,000.00"
+Officesupplies,"$8,000.00"
+Maintenancerepairs,"$6,000.00"
+Janitorial,"$8,000.00"
+
+COMMUNICATIONS
+Item,Annual Cost
+Phonesystems,"$6,000.00"
+Mobiledevices,"$4,000.00"
+
+EMPLOYEE RELATED
+Item,Annual Cost
+Trainingdevelopment,"$10,000.00"
+Recruiting,"$8,000.00"
+Travelentertainment,"$12,000.00"
+
+VEHICLE & TRANSPORTATION
+Item,Annual Cost
+Vehiclemaintenance,"$12,000.00"
+Parking,"$3,000.00"
+
+VARIABLE COSTS PER CALL
+Item,Value
+Miles per Call,25
+Vehicle Type,company-sedan
+Cost per Call,$13.75
+Total Variable Costs,"$4,537.50"
+
+OVERHEAD SUMMARY
+Total Fixed Overhead,"$454,600.00"
+Total Variable Costs,"$4,537.50"
+Grand Total,"$459,137.50"

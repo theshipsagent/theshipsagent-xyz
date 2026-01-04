@@ -1,0 +1,25 @@
+Ship Agency Financial Model - Executive Summary
+Scenario:,Example - Traditional Model
+Model Type:,Traditional
+Export Date:,2026-01-03
+
+KEY PERFORMANCE INDICATORS
+Metric,Value,Unit
+Total Port Calls,330,calls
+Total Employees,27,employees
+Revenue per Call,"$6,531.47",$/call
+Cost per Call,"$14,588.10",$/call
+Delta per Call (Total),"$-8,056.63",$/call
+Direct Delta per Call (KEY KPI),"$2,425.31",$/call
+
+FINANCIAL SUMMARY
+Category,Amount
+Total Revenue,"$2,155,384.05"
+Total Costs,"$4,814,072.06"
+  Payroll,"$3,798,014.00"
+  Benefits,"$556,920.56"
+  Overhead,"$454,600.00"
+  Variable Costs,"$4,537.50"
+EBITDA,"$-2,658,688.01"
+EBITDA Margin,-123.4%
+Break-Even Calls,737

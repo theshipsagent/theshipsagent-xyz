@@ -1,0 +1,193 @@
+{
+  "defaultHQLocation": {
+    "id": "houston-hq",
+    "name": "Houston",
+    "type": "hq",
+    "state": "TX",
+    "active": true,
+    "corporateStaff": [
+      { "position": "CEO/President", "salary": 350000, "count": 1 },
+      { "position": "CFO", "salary": 275000, "count": 1 },
+      { "position": "Controller", "salary": 165000, "count": 1 },
+      { "position": "VP Ops", "salary": 225000, "count": 1 },
+      { "position": "VP Commercial", "salary": 225000, "count": 1 },
+      { "position": "Commercial Manager", "salary": 150000, "count": 1 },
+      { "position": "Executive Admin", "salary": 90000, "count": 1 },
+      { "position": "HR Manager", "salary": 200000, "count": 1 },
+      { "position": "HR Clerk/Payroll", "salary": 40.87, "count": 1 },
+      { "position": "IT Manager", "salary": 175000, "count": 1 },
+      { "position": "Desktop Support", "salary": 95000, "count": 1 },
+      { "position": "Accounting Manager", "salary": 125000, "count": 1 },
+      { "position": "Accounting Supervisor", "salary": 80000, "count": 1 },
+      { "position": "Accounting Clerk", "salary": 31.25, "count": 2 },
+      { "position": "Documentation Manager", "salary": 95000, "count": 1 },
+      { "position": "Document Clerk", "salary": 31.25, "count": 2 }
+    ],
+    "portStaff": [
+      { "position": "Port Ops Manager", "salary": 142500, "count": 1 },
+      { "position": "Asst Ops Manager", "salary": 107500, "count": 1 },
+      { "position": "Ship Agent", "salary": 107500, "count": 3 },
+      { "position": "Boarding Agent/Runner", "salary": 38.46, "count": 2, "isHourly": true, "annualHours": 2080 },
+      { "position": "Ops Admin Clerk", "salary": 31.25, "count": 2 }
+    ],
+    "revenue": {
+      "shipTypes": [
+        { "type": "Grain", "calls": 80, "feePerCall": 12000, "fundsPerCall": 135000 },
+        { "type": "Coal", "calls": 60, "feePerCall": 9800, "fundsPerCall": 100000 },
+        { "type": "Container", "calls": 120, "feePerCall": 500, "fundsPerCall": 5000 },
+        { "type": "Crude Tankers", "calls": 40, "feePerCall": 4000, "fundsPerCall": 35000 },
+        { "type": "Break-bulk", "calls": 30, "feePerCall": 4500, "fundsPerCall": 15000 }
+      ],
+      "husbandry": {
+        "enabled": true,
+        "marginPercent": 9
+      },
+      "commission": {
+        "enabled": true,
+        "marginPercent": 1.5
+      },
+      "documentation": {
+        "manualAmount": 50000
+      }
+    },
+    "overhead": {
+      "officeSpace": {
+        "sqft": 5000,
+        "costPerSqft": 22
+      },
+      "insurance": {
+        "longshoremen": 25000,
+        "errorsOmissions": 50000,
+        "generalLiability": 15000
+      },
+      "technology": {
+        "office365": 3600,
+        "erpNetSuite": 50000,
+        "crmDynamics": 12000,
+        "specializedSaaS": 30000
+      },
+      "regulatory": {
+        "customsBond": 15000,
+        "fmcLicensing": 5000
+      },
+      "other": {
+        "vehicleMaintenance": 12000,
+        "miscellaneous": 0
+      }
+    }
+  },
+  "defaultPortOfficeLocation": {
+    "name": "New Port Office",
+    "type": "port-office",
+    "state": "",
+    "active": true,
+    "corporateStaff": [],
+    "portStaff": [
+      { "position": "Port Ops Manager", "salary": 142500, "count": 1 },
+      { "position": "Ship Agent", "salary": 107500, "count": 2 },
+      { "position": "Boarding Agent/Runner", "salary": 38.46, "count": 1, "isHourly": true, "annualHours": 2080 },
+      { "position": "Ops Admin Clerk", "salary": 65000, "count": 1 }
+    ],
+    "revenue": {
+      "shipTypes": [
+        { "type": "Container", "calls": 50, "feePerCall": 500, "fundsPerCall": 5000 },
+        { "type": "Break-bulk", "calls": 20, "feePerCall": 4500, "fundsPerCall": 15000 }
+      ],
+      "husbandry": {
+        "enabled": true,
+        "marginPercent": 9
+      },
+      "commission": {
+        "enabled": true,
+        "marginPercent": 1.5
+      },
+      "documentation": {
+        "manualAmount": 0
+      }
+    },
+    "overhead": {
+      "officeSpace": {
+        "sqft": 2500,
+        "costPerSqft": 20
+      },
+      "insurance": {
+        "longshoremen": 25000,
+        "errorsOmissions": 50000,
+        "generalLiability": 15000
+      },
+      "technology": {
+        "office365": 3600,
+        "erpNetSuite": 0,
+        "crmDynamics": 12000,
+        "specializedSaaS": 30000
+      },
+      "regulatory": {
+        "customsBond": 15000,
+        "fmcLicensing": 5000
+      },
+      "other": {
+        "vehicleMaintenance": 12000,
+        "miscellaneous": 0
+      }
+    }
+  },
+  "defaultVirtualSatelliteLocation": {
+    "name": "New Virtual/Satellite Office",
+    "type": "virtual-satellite-office",
+    "state": "",
+    "active": true,
+    "corporateStaff": [],
+    "portStaff": [
+      { "position": "Remote Ship Agent", "salary": 107500, "count": 1 }
+    ],
+    "revenue": {
+      "shipTypes": [],
+      "husbandry": {
+        "enabled": false,
+        "marginPercent": 0
+      },
+      "commission": {
+        "enabled": false,
+        "marginPercent": 0
+      },
+      "documentation": {
+        "manualAmount": 0
+      }
+    },
+    "overhead": {
+      "officeSpace": {
+        "sqft": 0,
+        "costPerSqft": 0
+      },
+      "insurance": {
+        "longshoremen": 0,
+        "errorsOmissions": 15000,
+        "generalLiability": 0
+      },
+      "technology": {
+        "office365": 1200,
+        "erpNetSuite": 0,
+        "crmDynamics": 0,
+        "specializedSaaS": 5000
+      },
+      "regulatory": {
+        "customsBond": 0,
+        "fmcLicensing": 0
+      },
+      "other": {
+        "vehicleMaintenance": 0,
+        "miscellaneous": 0
+      }
+    }
+  },
+  "globalAssumptions": {
+    "healthInsurancePerEmployee": 15000,
+    "retirement401kPercent": 4,
+    "aiReductionFactors": {
+      "documentationStaff": 0.60,
+      "accountingClerks": 0.50,
+      "opsAdminClerks": 0.70,
+      "technologyIncrease": 150000
+    }
+  }
+}

@@ -1,0 +1,20 @@
+Ship Agency Financial Model - Revenue Detail
+
+PORT CALLS BY SHIP TYPE
+Ship Type,Calls,Fee per Call,Total Fees,Cash Flow per Call
+Grain,80,"$12,000.00","$960,000.00","$135,000.00"
+Coal,60,"$9,800.00","$588,000.00","$100,000.00"
+Container,120,$500.00,"$60,000.00","$5,000.00"
+Crude Tankers,40,"$4,000.00","$160,000.00","$35,000.00"
+Break-bulk,30,"$4,500.00","$135,000.00","$15,000.00"
+
+REVENUE SUMMARY
+Category,Amount
+Base Agency Fees,"$1,903,000.00"
+Husbandry Revenue (9%),"$171,270.00"
+Commission Revenue (1.5%),"$31,114.05"
+Documentation Revenue,"$50,000.00"
+Total Revenue,"$2,155,384.05"
+
+Total Port Calls,330
+Revenue per Call,"$6,531.47"
