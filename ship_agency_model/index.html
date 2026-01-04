@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ship Agency Financial Model - Traditional vs AI-Enabled</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/model-styles.css">
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>Ship Agency Financial Model</h1>
+      <p>Interactive calculator comparing Traditional vs. AI-Enabled operations across 13 US port locations</p>
+    </header>
+
+    <!-- Scenario Controls -->
+    <div class="card">
+      <div class="card-body">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="flex: 1;">
+            <label class="form-label">Current Scenario:</label>
+            <select id="scenarioSelector" class="form-select" style="max-width: 400px;">
+              <option value="">-- Select Scenario --</option>
+            </select>
+          </div>
+          <div>
+            <button id="btnNewScenario" class="btn btn-primary">New Scenario</button>
+            <button id="btnSaveScenario" class="btn btn-success">Save</button>
+            <button id="btnLoadExample" class="btn btn-secondary">Load Example</button>
+            <button id="btnExport" class="btn btn-secondary">Export</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="locations">Locations</button>
+      <button class="tab" data-tab="corporate-overhead">Corporate Overhead</button>
+      <button class="tab" data-tab="sensitivity">Sensitivity Analysis</button>
+      <button class="tab" data-tab="cycle-time">Cycle Time Analysis</button>
+      <button class="tab" data-tab="compare">Compare Scenarios</button>
+    </div>
+
+    <!-- Tab Content: Dashboard -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="grid grid-2col">
+        <!-- Traditional Model Column -->
+        <div class="card">
+          <div class="card-header">
+            Traditional Model <span class="badge badge-traditional">Manual Operations</span>
+          </div>
+          <div id="dashboardTraditional">
+            <p class="text-muted">No scenario loaded. Create a new scenario or load an example.</p>
+          </div>
+        </div>
+
+        <!-- AI-Enabled Model Column -->
+        <div class="card">
+          <div class="card-header">
+            AI-Enabled Model <span class="badge badge-ai">Automated Operations</span>
+          </div>
+          <div id="dashboardAI">
+            <p class="text-muted">No AI scenario loaded. Create AI scenario from Traditional model.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delta Analysis -->
+      <div class="card mt-2">
+        <div class="card-header">Delta Analysis: AI vs. Traditional</div>
+        <div id="deltaAnalysis">
+          <p class="text-muted">Load both Traditional and AI scenarios to see comparison.</p>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid grid-2col mt-2">
+        <div class="card">
+          <div class="card-header">Revenue & Cost Breakdown</div>
+          <canvas id="chartRevenueCost"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-header">Delta per Call Comparison</div>
+          <canvas id="chartDeltaPerCall"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Content: Locations -->
+    <div id="tab-locations" class="tab-content">
+      <div class="grid grid-2col">
+        <!-- Location List -->
+        <div class="card">
+          <div class="card-header">Locations</div>
+          <div style="margin-bottom: 16px;">
+            <button id="btnAddHQ" class="btn btn-primary btn-small">Add HQ</button>
+            <button id="btnAddPortOffice" class="btn btn-primary btn-small">Add Port Office</button>
+            <button id="btnAddVirtualSatellite" class="btn btn-primary btn-small">Add Virtual/Satellite Office</button>
+          </div>
+          <div id="locationList">
+            <p class="text-muted">No scenario loaded.</p>
+          </div>
+        </div>
+
+        <!-- Location Editor -->
+        <div class="card">
+          <div class="card-header">
+            <span id="locationEditorTitle">Location Editor</span>
+          </div>
+          <div id="locationEditor">
+            <p class="text-muted">Select a location to edit.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Content: Corporate Overhead -->
+    <div id="tab-corporate-overhead" class="tab-content">
+      <!-- Content will be rendered by CorporateOverheadUI.render() -->
+    </div>
+
+    <!-- Tab Content: Sensitivity Analysis -->
+    <div id="tab-sensitivity" class="tab-content">
+      <div class="card">
+        <div class="card-header">Sensitivity Analysis</div>
+        <div class="card-body">
+          <p class="text-muted">Adjust key variables to see impact on financials (±20% range)</p>
+
+          <!-- Sensitivity Sliders -->
+          <div id="sensitivityControls">
+            <div class="form-group">
+              <label class="form-label">Port Call Volume: <span id="sliderCallsValue">0%</span></label>
+              <input type="range" id="sliderCalls" class="form-control" min="-20" max="20" value="0" step="1">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Average Fee per Call: <span id="sliderFeesValue">0%</span></label>
+              <input type="range" id="sliderFees" class="form-control" min="-20" max="20" value="0" step="1">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Payroll Costs: <span id="sliderPayrollValue">0%</span></label>
+              <input type="range" id="sliderPayroll" class="form-control" min="-20" max="20" value="0" step="1">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Overhead Costs: <span id="sliderOverheadValue">0%</span></label>
+              <input type="range" id="sliderOverhead" class="form-control" min="-20" max="20" value="0" step="1">
+            </div>
+
+            <button id="btnResetSensitivity" class="btn btn-secondary mt-2">Reset All</button>
+            <button id="btnSaveSensitivity" class="btn btn-primary mt-2">Save as New Scenario</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sensitivity Results -->
+      <div class="card mt-2">
+        <div class="card-header">Sensitivity Results</div>
+        <div id="sensitivityResults">
+          <p class="text-muted">Adjust sliders to see impact.</p>
+        </div>
+      </div>
+
+      <!-- Tornado Chart -->
+      <div class="card mt-2">
+        <div class="card-header">Tornado Chart - Impact Ranking</div>
+        <canvas id="chartTornado"></canvas>
+      </div>
+    </div>
+
+    <!-- Tab Content: Cycle Time Analysis -->
+    <div id="tab-cycle-time" class="tab-content">
+      <!-- Content will be rendered by CycleTimeUI.render() -->
+    </div>
+
+    <!-- Tab Content: Compare Scenarios -->
+    <div id="tab-compare" class="tab-content">
+      <div class="card">
+        <div class="card-header">Compare Scenarios</div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Scenario 1:</label>
+              <select id="compareScenario1" class="form-select">
+                <option value="">-- Select Scenario --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Scenario 2:</label>
+              <select id="compareScenario2" class="form-select">
+                <option value="">-- Select Scenario --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Scenario 3 (Optional):</label>
+              <select id="compareScenario3" class="form-select">
+                <option value="">-- Select Scenario --</option>
+              </select>
+            </div>
+          </div>
+          <button id="btnCompare" class="btn btn-primary">Compare</button>
+        </div>
+      </div>
+
+      <!-- Comparison Results -->
+      <div class="card mt-2">
+        <div class="card-header">Comparison Results</div>
+        <div id="comparisonResults">
+          <p class="text-muted">Select scenarios to compare.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/data-model.js"></script>
+  <script src="js/core/calculations.js"></script>
+
+  <!-- Utilities -->
+  <script src="js/utils/formatting.js"></script>
+  <script src="js/utils/storage.js"></script>
+
+  <!-- UI Components -->
+  <script src="js/ui/dashboard.js"></script>
+  <script src="js/ui/location-editor.js"></script>
+  <script src="js/ui/corporate-overhead.js"></script>
+  <script src="js/ui/sensitivity.js"></script>
+  <script src="js/ui/cycle-time.js"></script>
+  <script src="js/ui/comparison.js"></script>
+
+  <!-- Features -->
+  <script src="js/features/export.js"></script>
+
+  <!-- Main Application -->
+  <script src="js/app.js"></script>
+</body>
+</html>
