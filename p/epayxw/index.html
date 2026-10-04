@@ -1,0 +1,1872 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>The Engine — The Package</title>
+<style>
+  :root {
+    --bg: #0e141b;
+    --panel: #141c25;
+    --panel-2: #1a2430;
+    --ink: #e9edf2;
+    --ink-dim: #a9b3bf;
+    --ink-mute: #7c8794;
+    --line: #253040;
+    --accent: #4f7fb3;
+    --accent-2: #6c8fa8;
+    --amber: #c89552;
+    --red: #c05a5a;
+    --green: #4f9574;
+    --purple: #a186b3;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f4ef;
+      --panel: #ffffff;
+      --panel-2: #f1ede4;
+      --ink: #15202b;
+      --ink-dim: #46525f;
+      --ink-mute: #6a7682;
+      --line: #e2ddd1;
+      --accent: #2d4a6b;
+      --accent-2: #3f6186;
+      --amber: #a06b1e;
+      --red: #a0352d;
+      --green: #2b6a46;
+      --purple: #6b4b85;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+  .serif { font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(180deg, #0b1118 0%, #0e141b 100%);
+    color: #e9edf2;
+    padding: 70px 0 90px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(1200px 400px at 70% 20%, rgba(80,120,170,0.18), transparent 60%),
+      radial-gradient(900px 300px at 10% 90%, rgba(90,120,160,0.14), transparent 70%);
+    pointer-events: none;
+  }
+  .hero .wrap { position: relative; }
+  .eyebrow {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #9fb0c7;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(44px, 7vw, 84px);
+    line-height: 1.02;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+  .hero .sub {
+    font-size: clamp(18px, 2vw, 22px);
+    color: #cfd8e3;
+    max-width: 720px;
+    margin: 0 0 32px;
+  }
+  .meta {
+    color: #8ea1b7;
+    font-size: 14px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 18px;
+  }
+  .meta b { color: #cfd8e3; font-weight: 600; }
+
+  /* Nav */
+  nav.toc {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.toc .wrap {
+    display: flex;
+    overflow-x: auto;
+    gap: 4px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+  }
+  nav.toc .wrap::-webkit-scrollbar { display: none; }
+  nav.toc a {
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 13px;
+    color: var(--ink-dim);
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  nav.toc a:hover { color: var(--ink); border-color: var(--line); }
+  nav.toc a.ch { color: var(--accent); font-weight: 600; }
+
+  /* Chapter headers */
+  .chapter {
+    padding: 70px 0 36px;
+    border-top: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .chapter .wrap { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+  .chapter .num {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: clamp(80px, 14vw, 140px);
+    line-height: 0.85;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    flex: 0 0 auto;
+  }
+  .chapter .body { flex: 1 1 400px; min-width: 0; }
+  .chapter .kicker {
+    letter-spacing: 0.14em; text-transform: uppercase;
+    font-size: 12px; color: var(--ink-mute); margin-bottom: 10px;
+  }
+  .chapter h2 {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: clamp(32px, 5vw, 54px);
+    line-height: 1.05;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .chapter .lede {
+    font-size: 18px; color: var(--ink-dim); max-width: 720px; margin: 10px 0 0;
+  }
+
+  /* Sections */
+  section.slide {
+    padding: 50px 0;
+    border-top: 1px solid var(--line);
+  }
+  section.slide .kicker {
+    letter-spacing: 0.14em; text-transform: uppercase;
+    font-size: 11px; color: var(--accent-2); margin-bottom: 12px;
+    font-weight: 600;
+  }
+  section.slide h3 {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(26px, 3.6vw, 38px);
+    line-height: 1.15;
+    margin: 0 0 28px;
+    letter-spacing: -0.005em;
+  }
+  section.slide h3 em { font-style: italic; color: var(--ink-dim); font-weight: 500; }
+  section.slide .foot {
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-style: italic;
+    border-top: 1px dashed var(--line);
+    padding-top: 14px;
+  }
+
+  /* Cards grid */
+  .grid { display: grid; gap: 14px; }
+  .g2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  @media (max-width: 820px) {
+    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+    .g2.keep-2, .g4.keep-2 { grid-template-columns: 1fr 1fr; }
+  }
+  .card {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+  }
+  .card .sub {
+    color: var(--accent-2);
+    font-size: 13px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .card p { margin: 0 0 10px; color: var(--ink-dim); font-size: 15px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul { margin: 0; padding-left: 18px; color: var(--ink-dim); font-size: 15px; }
+  .card ul li { margin-bottom: 8px; }
+
+  .pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .pill.blue { background: var(--accent); }
+  .pill.amber { background: var(--amber); }
+  .pill.red { background: var(--red); }
+  .pill.green { background: var(--green); }
+  .pill.purple { background: var(--purple); }
+  .pill.gray { background: #6b7684; }
+
+  /* Big-number cards */
+  .stats { display: grid; gap: 14px; grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 820px) { .stats { grid-template-columns: 1fr 1fr; } }
+  .stat {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 18px;
+    text-align: center;
+  }
+  .stat .n {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .stat.red .n { color: var(--red); }
+  .stat.amber .n { color: var(--amber); }
+  .stat.green .n { color: var(--green); }
+  .stat.blue .n { color: var(--accent); }
+  .stat .l { font-size: 13px; color: var(--ink-mute); }
+
+  /* Highlight band */
+  .band {
+    background: linear-gradient(180deg, #0b1118, #0e141b);
+    color: #e9edf2;
+    border: 1px solid #1b2635;
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    margin-top: 20px;
+  }
+  @media (prefers-color-scheme: light) {
+    .band { background: #15202b; color: #f0f1f3; border-color: #15202b; }
+  }
+  .band b { color: #ffffff; }
+  .band.quiet {
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  @media (prefers-color-scheme: light) {
+    .band.quiet { background: #f1ede4; color: var(--ink); }
+  }
+  .band.quiet b { color: var(--ink); }
+
+  /* Flow / pipeline */
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    align-items: stretch;
+  }
+  @media (max-width: 820px) { .flow { grid-template-columns: 1fr 1fr; } }
+  .step {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    position: relative;
+  }
+  .step .tag {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  /* Table */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 14px;
+  }
+  table.data th, table.data td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.data th { color: var(--accent); font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; background: color-mix(in srgb, var(--panel-2) 85%, var(--accent) 15%); }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td.old { color: var(--red); }
+  table.data td.new { color: var(--green); }
+  .table-wrap { overflow-x: auto; }
+
+  /* List rows */
+  .rows { display: grid; gap: 10px; }
+  .row {
+    display: grid;
+    grid-template-columns: 50px 1fr 2fr;
+    gap: 20px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    align-items: start;
+  }
+  @media (max-width: 820px) {
+    .row { grid-template-columns: 40px 1fr; }
+    .row .last { grid-column: 1 / -1; color: var(--ink-dim); font-size: 14px; }
+  }
+  .row .no {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: 32px;
+    color: var(--accent);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .row .ttl { font-weight: 700; }
+  .row .ttl .s { color: var(--accent-2); font-weight: 600; font-size: 13px; display: block; margin-top: 4px; }
+  .row .last { color: var(--ink-dim); font-size: 14px; }
+
+  /* Pipeline arrows */
+  .pipe {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 820px) { .pipe { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 480px) { .pipe { grid-template-columns: 1fr 1fr; } }
+  .stage {
+    padding: 14px 10px;
+    text-align: center;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .stage small { display: block; font-weight: 400; opacity: 0.9; margin-top: 2px; }
+  .stage.before { background: var(--accent); }
+  .stage.call { background: var(--amber); }
+  .stage.close { background: var(--green); }
+
+  /* SWOT */
+  .swot { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 820px) { .swot { grid-template-columns: 1fr; } }
+  .swot .q {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .swot .q h4 { margin: 0 0 12px; letter-spacing: 0.12em; text-transform: uppercase; font-size: 13px; }
+  .swot .s { background: rgba(79, 149, 116, 0.10); }
+  .swot .s h4 { color: var(--green); }
+  .swot .w { background: rgba(192, 90, 90, 0.10); }
+  .swot .w h4 { color: var(--red); }
+  .swot .o { background: rgba(79, 127, 179, 0.10); }
+  .swot .o h4 { color: var(--accent); }
+  .swot .t { background: rgba(200, 149, 82, 0.10); }
+  .swot .t h4 { color: var(--amber); }
+  .swot ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-dim); }
+  .swot li { margin-bottom: 8px; }
+
+  /* Three columns colored (red/purple/blue ocean) */
+  .ocean { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  @media (max-width: 820px) { .ocean { grid-template-columns: 1fr; } }
+  .ocean .o {
+    border-radius: var(--radius); padding: 20px; border: 1px solid var(--line);
+  }
+  .ocean .red { background: rgba(192, 90, 90, 0.09); }
+  .ocean .purple { background: rgba(161, 134, 179, 0.10); }
+  .ocean .blue { background: rgba(79, 127, 179, 0.10); }
+  .ocean h4 { margin: 0 0 6px; letter-spacing: 0.12em; text-transform: uppercase; font-size: 13px; }
+  .ocean .red h4 { color: var(--red); }
+  .ocean .purple h4 { color: var(--purple); }
+  .ocean .blue h4 { color: var(--accent); }
+  .ocean .sub { font-size: 13px; color: var(--ink-mute); margin-bottom: 12px; font-weight: 600; }
+  .ocean ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-dim); }
+  .ocean li { margin-bottom: 10px; }
+
+  /* Stops / Continues */
+  .sc { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 820px) { .sc { grid-template-columns: 1fr; } }
+  .sc .col { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: var(--panel-2); }
+  .sc .stops .pill { background: var(--red); }
+  .sc .cont .pill { background: var(--green); }
+  .sc ul { margin: 0; padding-left: 18px; color: var(--ink-dim); font-size: 14px; }
+  .sc li { margin-bottom: 10px; }
+  .sc li b { color: var(--ink); font-weight: 600; }
+
+  /* Diminishing returns chart (SVG wrap) */
+  .chart-wrap {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .chart-wrap svg { width: 100%; height: auto; display: block; }
+
+  /* 2-column text/aside */
+  .split { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  @media (max-width: 820px) { .split { grid-template-columns: 1fr; } }
+
+  /* Closing */
+  .closing {
+    padding: 70px 0 90px;
+    background: linear-gradient(180deg, #0b1118, #0e141b);
+    color: #e9edf2;
+    border-top: 1px solid var(--line);
+  }
+  @media (prefers-color-scheme: light) {
+    .closing { background: #15202b; color: #f0f1f3; }
+  }
+  .closing h2 {
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    font-size: clamp(28px, 4vw, 44px);
+    margin: 0 0 24px;
+    color: #ffffff;
+  }
+  .closing .kicker { color: #9fb0c7; }
+  .closing .two {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;
+  }
+  @media (max-width: 820px) { .closing .two { grid-template-columns: 1fr; } }
+  .closing .two h3 { color: #ffffff; margin: 0 0 14px; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; font-weight: 700; }
+  .closing .pt {
+    display: grid; grid-template-columns: 36px 1fr; gap: 14px;
+    margin-bottom: 18px;
+  }
+  .closing .pt .n { color: #cfd8e3; font-family: "Iowan Old Style", Palatino, Georgia, serif; font-size: 24px; font-weight: 700; line-height: 1; }
+  .closing .pt b { color: #ffffff; display: block; margin-bottom: 4px; }
+  .closing .pt p { margin: 0; color: #cfd8e3; font-size: 15px; }
+  .closing .final { margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); color: #cfd8e3; }
+  .closing .final b { color: #ffffff; }
+
+  footer {
+    padding: 36px 0;
+    text-align: center;
+    color: var(--ink-mute);
+    font-size: 13px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Bar chart (mail record) */
+  .bars { display: grid; gap: 8px; }
+  .bar {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px;
+    font-size: 13px;
+  }
+  .bar .label { color: var(--ink-dim); }
+  .bar .track { position: relative; height: 18px; background: color-mix(in srgb, var(--line) 60%, transparent); border-radius: 4px; grid-column: 1 / -1; margin-top: 2px; }
+  .bar .fill { position: absolute; inset: 0; width: var(--w); border-radius: 4px; }
+  .bar .num { color: var(--ink); font-weight: 600; font-size: 12px; }
+  .bar.b1 .fill { background: var(--amber); }
+  .bar.b2 .fill { background: var(--amber); }
+  .bar.b3 .fill { background: var(--accent); }
+  .bar.b4 .fill { background: #6b7684; }
+  .bar.b5 .fill { background: var(--accent); }
+  .bar.b6 .fill { background: var(--accent); }
+  .bar.b7 .fill { background: var(--red); }
+  .bar.b8 .fill { background: var(--red); }
+  .bar.b9 .fill { background: #6b7684; }
+
+  /* Timeline */
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    background: var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  @media (max-width: 820px) { .timeline { grid-template-columns: 1fr; gap: 1px; } }
+  .tl {
+    padding: 14px 12px;
+    background: var(--panel-2);
+  }
+  .tl .m { font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+  .tl .ev { font-size: 12px; color: var(--ink-dim); margin-bottom: 8px; }
+  .tl .ev b { color: var(--ink); font-weight: 600; display: block; }
+  .tl .ev.pause b { color: var(--red); }
+  .tl .ev.safe b { color: var(--ink-mute); }
+  .tl .ev.reset b { color: var(--amber); }
+  .tl .ev.work b { color: var(--accent); }
+  .tl .ev.plan b { color: var(--green); }
+  .tl .ev.own b { color: var(--red); }
+
+  /* Three-track table */
+  .tracks table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 2px;
+  }
+  .tracks th {
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+  .tracks th:first-child { background: transparent; }
+  .tracks th.before { background: var(--accent); }
+  .tracks th.call { background: var(--amber); }
+  .tracks th.close { background: var(--green); }
+  .tracks td {
+    padding: 12px 10px;
+    font-size: 12px;
+    color: var(--ink-dim);
+    vertical-align: top;
+    border-radius: 4px;
+  }
+  .tracks td.rh { color: var(--ink); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 11px; }
+  .tracks tr.ops td { background: rgba(79, 127, 179, 0.08); }
+  .tracks tr.ops td.rh { color: var(--accent); }
+  .tracks tr.acct td { background: rgba(200, 149, 82, 0.08); }
+  .tracks tr.acct td.rh { color: var(--amber); }
+  .tracks tr.fwd td { background: rgba(161, 134, 179, 0.08); }
+  .tracks tr.fwd td.rh { color: var(--purple); }
+
+  /* Confidential ribbon */
+  .conf {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #cfd8e3;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="conf">Confidential · a starting point for discussion</div>
+    <div class="eyebrow">Blue Water Shipping</div>
+    <h1>The Engine</h1>
+    <p class="sub">A package for the working days — the strategy, two concepts, and the website. One deck, four chapters, one ask at the end.</p>
+    <div class="meta">
+      <span>September 22, 2026</span>
+      <span>·</span>
+      <span><b>William Davis</b> — Project Manager</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#contents">Contents</a>
+    <a href="#ch1" class="ch">1 · The Engine</a>
+    <a href="#ch2" class="ch">2 · Agency Platform</a>
+    <a href="#ch3" class="ch">3 · BlueIQ</a>
+    <a href="#ch4" class="ch">4 · Website &amp; Portal</a>
+    <a href="#close">Closing</a>
+  </div>
+</nav>
+
+<!-- Contents -->
+<section class="slide" id="contents" style="padding-top:60px;">
+  <div class="wrap">
+    <div class="kicker">Contents</div>
+    <h3 class="serif">Four chapters and one ask</h3>
+    <div class="rows">
+      <div class="row">
+        <div class="no">1</div>
+        <div class="ttl">The Engine<span class="s">Pause, reset, strategy, plan</span></div>
+        <div class="last">Email, FileMaker, accounting and the reports are one machine at an inflection point. The case for stopping long enough to plan — with seven weeks of mail and two reconstructed cases as evidence — and what the pause, the reset and three working days produce.</div>
+      </div>
+      <div class="row">
+        <div class="no">2</div>
+        <div class="ttl">Agency Platform<span class="s">The port call as the pipeline</span></div>
+        <div class="last">A concept for the port-call record the audit found missing: eight stages from nomination to settlement, with port operations, accounting and forwarding as parallel tracks.</div>
+      </div>
+      <div class="row">
+        <div class="no">3</div>
+        <div class="ttl">BlueIQ<span class="s">One place for all data, all reports</span></div>
+        <div class="last">The reports as a product — direction B made concrete. A proven pipeline, re-pointed at Blue Water's own data and Blue Water's own reports.</div>
+      </div>
+      <div class="row">
+        <div class="no">4</div>
+        <div class="ttl">Website &amp; Portal<span class="s">A first read, and what to review</span></div>
+        <div class="last">bluewatershipping.com and the Pilotsheet portal from the outside: what is there, what the security scan says, the customer-access question, and a concept direction for a separate session.</div>
+      </div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>Closing:</b> what this needs — from the three of us, and from ownership.</div>
+    <div class="foot">Each chapter stands on its own and can be presented separately; the page numbers run through the package.</div>
+  </div>
+</section>
+
+<!-- CHAPTER 1 -->
+<section class="chapter" id="ch1">
+  <div class="wrap">
+    <div class="num">1</div>
+    <div class="body">
+      <div class="kicker">Chapter 1</div>
+      <h2>The Engine</h2>
+      <p class="lede">Pause, reset, strategy, plan. Email, FileMaker, accounting and the reports are one machine at an inflection point.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The Engine</div>
+    <h3 class="serif">Two systems, the people, the output, the books — one machine</h3>
+    <div class="grid g4 keep-2">
+      <div class="card"><span class="pill blue">Email</span><p>Every instruction, nomination, SOF and B/L arrives and leaves here. The shared office mailboxes are the operations record.</p></div>
+      <div class="card"><span class="pill blue">FileMaker</span><p>Port calls, vessels, cargo, disbursements, filings, CRM — everything except the ledger.</p></div>
+      <div class="card"><span class="pill amber">Reports</span><p>Lineups, export reports, summaries, the portal — assembled from FileMaker, sent by email, free to the customer.</p></div>
+      <div class="card"><span class="pill green">Customers</span><p>Principals, elevators, traders and charterers — who pay for agency service and read what we send.</p></div>
+    </div>
+    <div class="grid g2" style="margin-top: 14px;">
+      <div class="card"><span class="pill gray">Accounting</span><p>Sage Intacct — fed from FileMaker by API. Disbursements, invoices, the money. Moved off FileMaker already, and it worked.</p></div>
+      <div class="card"><span class="pill amber">Operations</span><p>The port operations teams in every office, working the Pilotsheet all day — the core service, run inside FileMaker from nomination to sailing.</p></div>
+    </div>
+    <div class="band"><b>Outside relationships and the skill of the agents on the dock, this is how the company shows what it knows.</b> Agency is people and relationships; the engine is how those people work and what they hand the customer. The reports, free to the customer, are the shop window — the visible proof of experience. Built in-house, it works, and it was an advantage. The question is whether it still is, and what it costs.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">One machine, not three projects</div>
+    <h3 class="serif">Why working on them in silos has not worked</h3>
+    <div class="rows">
+      <div class="row"><div class="no">·</div><div class="ttl">Change email</div><div class="last">…and the shared operations mailboxes, the report distribution list, the attachments FileMaker links to, and the archive the P&amp;I club will one day ask for all change with it.</div></div>
+      <div class="row"><div class="no">·</div><div class="ttl">Change FileMaker</div><div class="last">…and every report's source data, the Intacct feed, the sailing-message templates that go out by email, and the customer portal change with it.</div></div>
+      <div class="row"><div class="no">·</div><div class="ttl">Change the reports</div><div class="last">…and the data they need from FileMaker, the delivery path through email, and what the customer expects to receive change with it.</div></div>
+    </div>
+    <div class="grid g2" style="margin-top: 18px;">
+      <div class="card"><h4>What is happening today</h4><p>Four folders, four board lanes, three separate assessments, one person. Silos — and inside the FileMaker silo, sub-silos: a feature request, a data fix and a plugin upgrade all "in progress" at once. Piecemeal, each piece reasonable, and the person carrying it and the wider organisation cannot sustain it.</p></div>
+      <div class="card"><h4>What follows from it</h4><p>There cannot be an email decision, a FileMaker decision, an accounting decision and a reports decision. There is one decision about the engine, taken at a higher altitude with all of it in view — then the ground-level targets can be struck tactically and efficiently. That is why this deck asks for a pause rather than a platform.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The mail record</div>
+    <h3 class="serif">Seven weeks of IT mail, measured</h3>
+    <div class="stats">
+      <div class="stat"><div class="n">452</div><div class="l">messages · 154 threads · 30 Jul – 21 Sep · one mailbox</div></div>
+      <div class="stat red"><div class="n">5.5%</div><div class="l">of messages are genuine user-facing faults — 9 of the 50 help-desk threads</div></div>
+      <div class="stat amber"><div class="n">6.2</div><div class="l">messages and 5.2 parties per development thread — the heaviest work by every proxy</div></div>
+      <div class="stat red"><div class="n">9 days</div><div class="l">median to close a seasonal gift-list edit, against 0.2 hours for a fault</div></div>
+    </div>
+    <div class="split" style="margin-top: 18px;">
+      <div class="card">
+        <h4>Where the messages went — share of 452, by the thread's originating request</h4>
+        <div class="bars" style="margin-top: 14px;">
+          <div class="bar b1"><span class="label">Reporting products and customer data</span><span class="num">19%</span><div class="track"><div class="fill" style="--w:95%;"></div></div></div>
+          <div class="bar b2"><span class="label">Database development and enhancement</span><span class="num">18%</span><div class="track"><div class="fill" style="--w:90%;"></div></div></div>
+          <div class="bar b3"><span class="label">Programme and analysis work</span><span class="num">17%</span><div class="track"><div class="fill" style="--w:85%;"></div></div></div>
+          <div class="bar b4"><span class="label">Automated / system-generated</span><span class="num">13%</span><div class="track"><div class="fill" style="--w:65%;"></div></div></div>
+          <div class="bar b5"><span class="label">Access, accounts and identity</span><span class="num">7%</span><div class="track"><div class="fill" style="--w:35%;"></div></div></div>
+          <div class="bar b6"><span class="label">Infrastructure and mail platform</span><span class="num">6%</span><div class="track"><div class="fill" style="--w:30%;"></div></div></div>
+          <div class="bar b7"><span class="label">Data-integrity defects</span><span class="num">6%</span><div class="track"><div class="fill" style="--w:30%;"></div></div></div>
+          <div class="bar b8"><span class="label">IT faults and incidents</span><span class="num">6%</span><div class="track"><div class="fill" style="--w:30%;"></div></div></div>
+          <div class="bar b9"><span class="label">Premises, equipment, website, lists, vendors, other</span><span class="num">9%</span><div class="track"><div class="fill" style="--w:45%;"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4>What it says</h4>
+        <ul>
+          <li>The load is building and reporting, not fixing. Faults are the smallest human category.</li>
+          <li>A third of the help-desk queue needs no IT judgement or is machine-generated: tariff edits, gift lists, board notices, backup alerts.</li>
+          <li>The lightest-value work is the slowest to close — the chasing pattern, measured.</li>
+          <li>Every share is a floor: one mailbox, what the project manager was copied on. The help-desk mailbox itself is not yet connected.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">Corpus built read-only from davis@bluewatershipping.com (INBOX/IT + INBOX/Reports), classified thread by thread against a written rule set. Shares ±3–4 points; volumes, not time; no trend possible from 7½ weeks.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Case one, from the record</div>
+    <h3 class="serif">One sheet of plywood: 160 days, five subject lines</h3>
+    <div class="stats">
+      <div class="stat red"><div class="n">160</div><div class="l">days, request to "done"</div></div>
+      <div class="stat"><div class="n">5</div><div class="l">subject lines, 4 threads, plus a ride inside an unrelated one</div></div>
+      <div class="stat red"><div class="n">7</div><div class="l">questions asked and never answered</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">quotes, approvals or insurance confirmations in the record</div></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>What the photo shows.</b> The plywood is up — a full sheet, not the 3 × 2 specified. The network equipment it was meant to carry was never moved onto it. The board entry is true of the plywood and false of the job. Nobody did anything wrong here: effort was real on every side. No single place held the matter, so it fell between people three times and was closed by a card nobody reconciled against the work.</div>
+    <div class="foot">Reconstructed from the mail corpus; April–July recovered from quoted history inside later messages. One mailbox — correspondence the project manager was not copied on is invisible.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Case two, from the record</div>
+    <h3 class="serif">Two FileMaker jobs, eight threads, closed with one word</h3>
+    <div class="split">
+      <div class="card">
+        <h4>One intent, recorded as two jobs</h4>
+        <p>Stop the Pilotsheet depending on what a person remembers to type: look up a vessel's particulars from a register keyed on IMO, and pick the agency service from a controlled list that maps to the ledger. Requested nine days apart, run by the same two people, estimated together to ownership in one message (about 14 programming hours), and signed off together on 21 September with one word: "Yes". Neither job sheet mentions the other.</p>
+      </div>
+      <div class="card">
+        <h4>Where the matter actually lived</h4>
+        <ul>
+          <li><b>File Maker | Ships Register</b> — job 2's origin, and the answer to its 'blocking' question</li>
+          <li><b>Freight Forwarding … Drop Down</b> — job 1's origin; the ledger-dependency dispute</li>
+          <li><b>Lists</b> — job 1 resolved; the code table; a revert proposal</li>
+          <li><b>Missing Categories</b> — the backfill list (~40 vessels); never returned to</li>
+          <li><b>Agency Service … / Ships Register</b> — both jobs' hour estimates, one message</li>
+          <li><b>Ships register auto fill</b> — job 2 executed; job 1 signed off; the plywood photo</li>
+        </ul>
+      </div>
+    </div>
+    <div class="stats" style="margin-top: 14px;">
+      <div class="stat"><div class="n">36</div><div class="l">days, first request to "Yes"</div></div>
+      <div class="stat red"><div class="n">26</div><div class="l">days a blocking question stood answered in the mail while the job stood 'Blocked'</div></div>
+      <div class="stat amber"><div class="n">4+</div><div class="l">hand-offs to the phone — decisions taken there are invisible to the record</div></div>
+      <div class="stat red"><div class="n">~40</div><div class="l">vessels left without a category — the backfill flagged, quantified, never done</div></div>
+    </div>
+    <div class="band quiet" style="margin-top:18px;"><b>What "Yes" covered.</b> An IMO lookup populating one layout, and a drop-down offered for review — both real, both below the written scope. Two representation changes visible in the sign-off screenshots went unremarked; a field was descoped back to free text in passing; a revert proposal was never withdrawn. Both sheets were stale by three to five weeks.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Why piecemeal is expensive</div>
+    <h3 class="serif">The mechanics, from the two cases and the corpus</h3>
+    <div class="grid g3">
+      <div class="card"><h4 style="color:var(--red);">No single place holds a matter</h4><p><em>Seen:</em> Five subject lines for one sheet of plywood; eight threads for one FileMaker intent; a facilities item finishing inside a development thread.</p><p><em>Cost:</em> Each hop drops context — seven questions died with a forked thread — and no subject line retrieves the matter afterwards.</p></div>
+      <div class="card"><h4 style="color:var(--amber);">Nobody holds the next step</h4><p><em>Seen:</em> Three silences of 2 months, 3½ weeks and 3 weeks; two ownership vacuums; 'they are waiting on you' / 'who is they?'</p><p><em>Cost:</em> Elapsed time is the cost. 160 days for a morning's work; 26 days with a blocker's answer sitting unread in the mail.</p></div>
+      <div class="card"><h4 style="color:var(--amber);">The list and the queue are different things</h4><p><em>Seen:</em> The two hardest 'drop everything' interrupts were not on the numbered priority list; a platform migration was added, then parked in 13 days.</p><p><em>Cost:</em> Capacity planned from the list understates the load. A two-hour task interrupted four times takes a day.</p></div>
+      <div class="card"><h4 style="color:var(--amber);">Closure by assertion</h4><p><em>Seen:</em> A board card reads 'done' against work not done; one "Yes" closes two jobs below their written scope; a backfill of ~40 records is flagged and never run.</p><p><em>Cost:</em> Rework arrives later, unbudgeted, wearing a new subject line — and the reports built on the data inherit the gap.</p></div>
+      <div class="card"><h4 style="color:var(--accent);">Decisions leave no record</h4><p><em>Seen:</em> At least four hand-offs to the phone in one case; a revert proposal never withdrawn; sheets three to five weeks stale.</p><p><em>Cost:</em> The next person — or the same person a month later — starts from zero. Key-person risk, manufactured daily.</p></div>
+      <div class="card"><h4 style="color:var(--amber);">The queue is a workshop, not a help desk</h4><p><em>Seen:</em> Faults are 5.5% of messages; development, reporting and programme work are over half; a third of help-desk threads need no IT judgement.</p><p><em>Cost:</em> Running a workshop through a help-desk inbox means every build is an interrupt and every interrupt looks like a build.</p></div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>None of this is effort or ability.</b> It is the absence of an operating model — one door, one owner per matter, exit conditions, written decisions, verified closure. That is what the reset installs.</div>
+    <div class="foot">Evidence: the classified corpus (154 threads) and the two case reconstructions. Time figures are elapsed days from the record, never estimated minutes.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Where we stand</div>
+    <h3 class="serif">Three assessments are finished — and they agree</h3>
+    <div class="grid g3">
+      <div class="card">
+        <span class="pill blue">Email</span>
+        <h4>Case for change, Rev 5 · memos 008, 012, 013</h4>
+        <ul>
+          <li>Self-hosted server on end-of-life consumer hardware, internet-facing</li>
+          <li>POP leaves the only copy of mail on laptops — some at 2 TB; no setting can stop it</li>
+          <li>No archive, retention or legal hold; gateway rejects real mail silently</li>
+          <li>Roughly $13–15K a year to fix properly; ~$84K over five years to stay as we are</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="pill blue">FileMaker</span>
+        <h4>Audit pack, 26 August</h4>
+        <ul>
+          <li>39 files · 258 tables · 16,015 fields · 4,148 scripts — measured, for the first time</li>
+          <li>It works. Real port calls run on it daily. The domain model is the asset</li>
+          <li>No proven restore, no development copy, one person able to maintain it</li>
+          <li>200–400 developer-days and $40–150K to rewire in place; platform decision deferred</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="pill amber">Operations</span>
+        <h4>IT board, 15 September</h4>
+        <ul>
+          <li>88 open items, 34 "in progress" at once, 267 closed — effort is not the problem</li>
+          <li>Incidents, data fixes, projects and platform decisions in one column, no dates</li>
+          <li>Most desktop tickets trace to the email architecture</li>
+          <li>Two platform decisions have sat in "waiting for" for months</li>
+        </ul>
+      </div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>None of the three asked the question that matters to ownership:</b> what is the engine worth, to whom, and for how much longer — and what is it costing us to find out?</div>
+    <div class="foot">Cost figures are the assessments' own estimates, labelled as such in each document; none is a quote.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">What the engine produces</div>
+    <h3 class="serif">The reports — the shop window customers actually see</h3>
+    <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Product</th><th>Built from</th><th>Delivered by</th><th>Cadence</th><th>Condition</th></tr></thead>
+      <tbody>
+        <tr><td><b>Elevator lineups — Mississippi River, Texas</b></td><td>FileMaker lineup files, updated by each office</td><td>Email list (iContact)</td><td>Daily</td><td class="old">Aging</td></tr>
+        <tr><td><b>Full-agency export report</b></td><td>Sailed-vessel archive / Exports Master</td><td>Email attachment</td><td>Weekly</td><td class="old">Aging</td></tr>
+        <tr><td><b>Cumulative export detail</b></td><td>Exports Master (507,551 records back to 2016)</td><td>Email attachment</td><td>Monthly</td><td class="old">Aging</td></tr>
+        <tr><td><b>Quarterly and annual summaries</b></td><td>Same source, rolled up</td><td>Email attachment</td><td>Quarterly</td><td class="old">Aging</td></tr>
+        <tr><td><b>Coal and other commodity reports</b></td><td>Dedicated FileMaker files</td><td>Email attachment</td><td>As required</td><td class="old">Aging</td></tr>
+        <tr><td><b>Customer web portal</b></td><td>FileMaker WebDirect</td><td>Browser</td><td>Live</td><td class="old">Map component broken; parked</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>These are the shop window.</b> Free to the customer, they are how the company demonstrates its experience — superficial to a degree, and still the thing a principal sees every morning. Assembled by hand from FileMaker, sent as attachments through a mail system we are about to replace, in formats unchanged for years; nobody has asked customers which ones they open, and nobody has costed the hours they take.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The threat</div>
+    <h3 class="serif">What we send for free, the market now sends better</h3>
+    <div class="split">
+      <div class="card">
+        <h4 style="color: var(--red);">What is changing outside the building</h4>
+        <ul>
+          <li><b>USDA now publishes interactive grain transportation and export dashboards</b> — weekly, public, free, and better formatted than what we send</li>
+          <li><b>Commercial data vendors</b> sell vessel tracking, port lineups and manifest data by subscription to anyone</li>
+          <li><b>Customers have analysts</b> — traders and elevators increasingly build their own views from the same public feeds</li>
+          <li><b>Assembly is no longer the skill</b> — software that compiles a lineup from a feed in seconds is now ordinary</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>What it means for the engine</h4>
+        <ul>
+          <li><b>A free report that repeats public data stops demonstrating anything</b> the day the public version is better — and that day is close</li>
+          <li><b>What survives is what only an agent on the dock knows</b>: the berth, the wait, the survey result, the reason for the delay, the relationship</li>
+          <li><b>The engine is optimised for the first kind of report</b> and has no way to capture or deliver the second</li>
+          <li><b>So each hour spent maintaining it as-is buys less</b> than the hour before — the definition of diminishing returns</li>
+        </ul>
+      </div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>The value these systems added was real and it is diminishing quickly.</b> Not because they broke — because the world caught up. The pace of the technology and the administrative burden of producing the output make this an inflection point, not a maintenance problem.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">An inflection point</div>
+    <h3 class="serif">The service is not in question — everything around it is</h3>
+    <div class="card" style="margin-bottom: 14px;">
+      <h4>The whole scope is one realisation, not three problems</h4>
+      <p>The core service — agency — is people, relationships and skill on the dock, and none of that is in question. Everything around it is: the presentation of the output, the tools the people work in, and the administrative burden of producing what the customer sees. The pace of the technology has made the gap visible. That is the inflection point.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><h4 style="color: var(--green);">Increase the value added</h4><p>Output presented in the form the customer's business now runs on — timely, readable on a phone, carrying what only our agents know — so the free report keeps demonstrating experience.</p></div>
+      <div class="card"><h4 style="color: var(--accent);">Attract new business</h4><p>The shop window is the first thing a prospective principal judges. A modern one wins nominations before anyone has met; a dated one loses them the same way.</p></div>
+      <div class="card"><h4 style="color: var(--amber);">Reduce the administrative burden</h4><p>Every hour spent assembling a lineup by hand, hunting a mail attachment or fixing a laptop is an hour not spent on the dock or with a customer — and in a market that sets the price, it is margin.</p></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>Three outcomes, one programme.</b> Any direction the working days choose is measured against these three — and the third one is the one the market lets us control.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Red ocean, purple water</div>
+    <h3 class="serif">When the market sets the price, you control three things</h3>
+    <div class="ocean">
+      <div class="o red">
+        <h4>Red Ocean</h4>
+        <div class="sub">Where agency lives</div>
+        <ul>
+          <li>The market sets the price. Nobody in this trade names their own</li>
+          <li>An ancient trade, run on customs and practices the whole world accepts — the same core service from every competitor</li>
+          <li>Differentiating on price is a race to the bottom; differentiating on service is table stakes</li>
+        </ul>
+      </div>
+      <div class="o purple">
+        <h4>Purple Water</h4>
+        <div class="sub">Where Blue Water can move</div>
+        <ul>
+          <li>Not a new market — a visibly different presence in the old one</li>
+          <li>Presentation and speed of output; information carrying what only our agents know; a customer experience that looks like this decade</li>
+          <li>Reached by taking cost and administration out of the engine and putting the time saved in front of the customer</li>
+        </ul>
+      </div>
+      <div class="o blue">
+        <h4>Blue Ocean</h4>
+        <div class="sub">Rare — worth a look, not a bet</div>
+        <ul>
+          <li>A product nobody sells: our dock-level data combined with the public feeds, delivered as a service rather than an attachment</li>
+          <li>Block 2 asks whether it exists; block 4 scores it. Nothing in this deck depends on finding it</li>
+          <li>If it exists, it is built on the same modernised engine — which is why the pause comes first</li>
+        </ul>
+      </div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>Cost, cost and cost.</b> When the price is set for you, margin is the only variable, and administration is where it leaks. Modernisation is a cost play first and a presentation play second — and the two are the same programme.</div>
+    <div class="foot">Red and blue ocean are the standard strategy terms; purple is ours — differentiated inside a market that sets the price.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Diminishing returns</div>
+    <h3 class="serif">Value peaked around 2016; we are in negative returns</h3>
+    <div class="split">
+      <div class="chart-wrap">
+        <svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diminishing returns curve">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#4f9574" stop-opacity="0.12"/>
+              <stop offset="0.33" stop-color="#c89552" stop-opacity="0.12"/>
+              <stop offset="0.66" stop-color="#c05a5a" stop-opacity="0.12"/>
+            </linearGradient>
+          </defs>
+          <!-- Zones -->
+          <rect x="40" y="20" width="186" height="240" fill="rgba(79,149,116,0.08)"/>
+          <rect x="226" y="20" width="94" height="240" fill="rgba(200,149,82,0.10)"/>
+          <rect x="320" y="20" width="240" height="240" fill="rgba(192,90,90,0.08)"/>
+
+          <text x="133" y="40" text-anchor="middle" fill="#4f9574" font-size="11" font-weight="700" letter-spacing="1">INCREASING RETURNS</text>
+          <text x="273" y="40" text-anchor="middle" fill="#c89552" font-size="11" font-weight="700" letter-spacing="1">DIMINISHING</text>
+          <text x="440" y="40" text-anchor="middle" fill="#c05a5a" font-size="11" font-weight="700" letter-spacing="1">NEGATIVE RETURNS</text>
+
+          <!-- Axis labels -->
+          <text x="40" y="285" fill="#7c8794" font-size="10">2005</text>
+          <text x="133" y="285" fill="#7c8794" font-size="10">2010</text>
+          <text x="226" y="285" fill="#7c8794" font-size="10">2015</text>
+          <text x="320" y="285" fill="#7c8794" font-size="10">2020</text>
+          <text x="413" y="285" fill="#7c8794" font-size="10">2025</text>
+          <text x="506" y="285" fill="#7c8794" font-size="10">2030</text>
+          <text x="20" y="150" fill="#7c8794" font-size="10" transform="rotate(-90 20 150)">Value to the customer →</text>
+
+          <!-- Current curve: rises, peaks, falls -->
+          <path d="M 40 260 Q 140 50, 240 70 Q 320 90, 400 240" stroke="#4f7fb3" stroke-width="3" fill="none"/>
+          <!-- Pivot curve -->
+          <path d="M 400 240 Q 460 180, 560 70" stroke="#4f9574" stroke-width="3" fill="none" stroke-dasharray="7 5"/>
+
+          <!-- Peak marker -->
+          <circle cx="240" cy="70" r="6" fill="#4f7fb3"/>
+          <text x="240" y="105" text-anchor="middle" fill="#4f7fb3" font-size="11" font-weight="600">Peak value — c. 2016</text>
+          <text x="240" y="118" text-anchor="middle" fill="#7c8794" font-size="10">an estimate, possibly generous</text>
+
+          <!-- We are here -->
+          <circle cx="400" cy="240" r="6" fill="#c05a5a"/>
+          <text x="400" y="215" text-anchor="middle" fill="#c05a5a" font-size="11" font-weight="600">We are here — 2026</text>
+          <text x="400" y="200" text-anchor="middle" fill="#7c8794" font-size="10">every hour buys less than it costs</text>
+
+          <!-- Pivot label -->
+          <text x="500" y="155" text-anchor="middle" fill="#4f9574" font-size="11" font-weight="700">Pivot</text>
+          <text x="500" y="170" text-anchor="middle" fill="#7c8794" font-size="10">a new curve on what only we know</text>
+
+          <!-- Legend -->
+          <g transform="translate(130 302)">
+            <line x1="0" y1="0" x2="20" y2="0" stroke="#4f7fb3" stroke-width="3"/>
+            <text x="26" y="4" fill="#7c8794" font-size="11">Current engine</text>
+            <line x1="150" y1="0" x2="170" y2="0" stroke="#4f9574" stroke-width="3" stroke-dasharray="5 3"/>
+            <text x="176" y="4" fill="#7c8794" font-size="11">Pivoted engine</text>
+          </g>
+        </svg>
+      </div>
+      <div class="card">
+        <h4>Reading the curve</h4>
+        <ul>
+          <li>Phase 1: built in-house by people who knew the trade, every screen and report moved the company forward. That was real, and it lasted a decade.</li>
+          <li>Phase 2: additions kept it level while the outside world — public data, cheaper software, customers with analysts — caught up.</li>
+          <li>Phase 3: since about 2019 more input has produced less output: the hours to make the reports, the laptops to hold the mail, the one person who can change anything.</li>
+          <li>The audit's 200–400 developer-days holds the line — it stops the fall. It does not climb. Only the green curve climbs, and it starts from where we stand, not from the peak.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">Illustrative curve, not measured data. The 2016 peak and the phase boundaries are the project manager's estimate; block 3 replaces them with the company's own cost and return figures.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">What no assessment has answered</div>
+    <h3 class="serif">The business questions — and the metrics that answer them</h3>
+    <div class="rows">
+      <div class="row"><div class="no">·</div><div class="ttl">What does the engine cost, all in — per port call?</div><div class="last">5-year total cost of ownership: licences, hardware, the person, the contractor, the laptops bought for mail, the hours lost — divided by the calls it serves. <span class="pill blue" style="margin-left:8px; margin-bottom:0;">TCO</span></div></div>
+      <div class="row"><div class="no">·</div><div class="ttl">What do the reports cost to produce — and what do they win?</div><div class="last">Hours per issue across every office, against the retention and new business they visibly support. <span class="pill blue" style="margin-left:8px; margin-bottom:0;">Cost-to-serve</span></div></div>
+      <div class="row"><div class="no">·</div><div class="ttl">What does a day down cost?</div><div class="last">3 August: internet, email and FileMaker off together; staff sent home. Multiply by the number of such days. <span class="pill blue" style="margin-left:8px; margin-bottom:0;">Cost of downtime</span></div></div>
+      <div class="row"><div class="no">·</div><div class="ttl">What is a lost decade of records worth?</div><div class="last">One server, one building, no proven restore, no off-site copy, hurricane season. <span class="pill blue" style="margin-left:8px; margin-bottom:0;">Revenue at risk</span></div></div>
+      <div class="row"><div class="no">·</div><div class="ttl">What would a pivot cost, and when does it pay back?</div><div class="last">The green curve, priced: people, data, delivery — against the blue curve, priced the same way. <span class="pill green" style="margin-left:8px; margin-bottom:0;">Payback period</span></div></div>
+      <div class="row"><div class="no">·</div><div class="ttl">What do customers value that only we can give?</div><div class="last">Not a survey — five conversations with principals and elevators about what they read, what they would miss, and what would win the next nomination. <span class="pill green" style="margin-left:8px; margin-bottom:0;">Value to customer</span></div></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>These are business questions, not IT questions</b> — which is why IT cannot answer them alone, and why the working days need finance, strategy and operations in the room.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The numbers we already hold</div>
+    <h3 class="serif">Enough to know the stakes — not enough to decide</h3>
+    <div class="grid g3">
+      <div class="stat blue"><div class="n">$13.5–15.5K</div><div class="l">per year: email done properly (M365 Premium + anti-fraud layer)</div></div>
+      <div class="stat red"><div class="n">~$84K</div><div class="l">five years of staying as we are — buying no suite, no files, no archive, no security</div></div>
+      <div class="stat blue"><div class="n">$40–150K</div><div class="l">cash, plus 200–400 developer-days, to rewire FileMaker in place (estimate, not a quote)</div></div>
+      <div class="stat red"><div class="n">$550K–1.1M</div><div class="l">per year of productivity lost to the systems, at 15–30% of the workday (public benchmark, not our payroll)</div></div>
+      <div class="stat red"><div class="n">1 day</div><div class="l">company-wide outage on 3 August — staff sent home; the cost of that day has never been calculated</div></div>
+      <div class="stat amber"><div class="n">~$548K</div><div class="l">requested and not received, visible in the disbursement data — a money trail the audit surfaced, to be verified</div></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>What is missing is the other side of the ledger.</b> We know roughly what the engine costs to fix and what it costs to leave alone. We do not know what it earns, what the reports are worth to a customer, or what a pivot would cost. Block 3 is where those numbers get built — by accounting and operations, with the assessments as inputs.</div>
+    <div class="foot">Sources: email case Rev 5 §9–10; audit ownership recommendation §5; issues log #001, #003. Each figure is labelled in its source as measured, estimate or benchmark.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The proposal</div>
+    <h3 class="serif">Pause · Reset · Strategy · Plan</h3>
+    <div class="grid g4 keep-2">
+      <div class="card"><span class="pill red">Pause</span><div class="sub">Now</div><p>Stop discretionary spend and feature work on every part of the engine. Keep only safety work and day-to-day support. Nothing new starts until the plan is signed.</p></div>
+      <div class="card"><span class="pill amber">Reset</span><div class="sub">Early October</div><p>One programme, one board, one folder, one owner. All the material — three assessments, the board, the reports, the numbers — in one pack. Customer conversations and the TCO build happen here, before anyone sits down.</p></div>
+      <div class="card"><span class="pill blue">Strategy</span><div class="sub">Mid October · 3 days</div><p>A mini team — strategy, finance, project management — spends a few days together and works through all of it: the engine as-is, the market, the economics, the options. SWOT, TCO, vendor evaluations, weighted scoring.</p></div>
+      <div class="card"><span class="pill green">Plan</span><div class="sub">November</div><p>One consolidated plan with timelines and budgets, presented to ownership. Ownership agrees, adjusts or redirects; sign-off by mid-November; execution from then, on whichever curve was chosen.</p></div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>Eight weeks.</b> The cost of the pause is two months of features nobody has asked for. The cost of not pausing is another year of piecemeal work on the flat part of the curve, and a platform decision taken by default.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The pause</div>
+    <h3 class="serif">What stops, and what does not</h3>
+    <div class="sc">
+      <div class="col stops">
+        <span class="pill">Stops</span>
+        <ul>
+          <li>New FileMaker features, layouts and dashboards — the request queue is frozen, not deleted</li>
+          <li>Plugin and version upgrades that are not security fixes</li>
+          <li>Laptops, drives and storage bought to hold email</li>
+          <li>The website rebuild and the Laravel migration</li>
+          <li>New software subscriptions — password manager, mail client platforms, proposals: all move to the Decide queue for block 4</li>
+          <li>Network kit beyond emergency repair, until the platform answer says what each office needs</li>
+          <li>Any new assessment, audit or consultant engagement</li>
+        </ul>
+      </div>
+      <div class="col cont">
+        <span class="pill">Continues</span>
+        <ul>
+          <li><b>The 1 October server:</b> install, the first proven restore, the sandbox, an off-site copy — the audit's Phase 0, required under every future</li>
+          <li><b>Gateway from reject to quarantine,</b> so real mail stops being lost silently</li>
+          <li><b>POP → IMAP cleanup and server-side noise filters</b> — cost nothing, remove tickets</li>
+          <li><b>The three admin logins</b> — mail server, gateway, FileMaker Server</li>
+          <li><b>Day-to-day support</b> through one door, in a support window, three things in progress at most</li>
+          <li><b>Fixes for a stopped operation</b> — always, through the sandbox once it exists</li>
+          <li><b>The reports keep going out</b> exactly as they are; nothing changes for a customer during the pause</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">The line between the columns: does it make the company safer, or does it make the engine bigger? Safer continues. Bigger waits.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The reset</div>
+    <h3 class="serif">One programme, one board, one pack, one set of roles</h3>
+    <div class="grid g2">
+      <div class="card"><h4 style="color: var(--accent);">One programme</h4><p>The Engine programme, three pillars — email, FileMaker, reports — on one foundation of network and support. No pillar has its own plan; the programme has one.</p></div>
+      <div class="card"><h4 style="color: var(--accent);">One board</h4><p>Four queues instead of one pile: Run (today's incidents) · Fix (weekly FileMaker batch) · Build (three active, max) · Decide (ownership, monthly). A label legend. Nothing enters except through the intake form.</p></div>
+      <div class="card"><h4 style="color: var(--amber);">One pack</h4><p>All the material is now in one folder. Before the working days it becomes one reading pack: the three assessments' summaries, the issues log, the board, the report inventory, and the numbers we already hold.</p></div>
+      <div class="card"><h4 style="color: var(--green);">One set of roles</h4><p>Ownership decides platform, money and policy. The project manager owns sequence, calendar and the pack. IT executes and advises. Operations managers own what the reports must do. Accounting owns the numbers.</p></div>
+    </div>
+    <div class="foot">The consolidation of the folders is already done; the board re-lay and the reading pack are the first two weeks of October.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The working days</div>
+    <h3 class="serif">A mini team, three days, four blocks, one output each</h3>
+    <div class="rows">
+      <div class="row"><div class="no">1</div><div class="ttl">The engine as-is<span class="s">Day 1 · morning</span></div><div class="last"><b>Inputs:</b> The three assessments, the issues log, the board — presented by their authors, questioned by the team. <br><b>Output:</b> A single agreed statement of fact. Disagreements logged, not argued.</div></div>
+      <div class="row"><div class="no">2</div><div class="ttl">The market and the customer<span class="s">Day 1 · afternoon</span></div><div class="last"><b>Inputs:</b> The report inventory; USDA's dashboards and two vendor products on screen next to ours; the five customer conversations, reported back. <br><b>Output:</b> What customers value, what is commoditised, what only we can supply — and whether any blue water exists.</div></div>
+      <div class="row"><div class="no">3</div><div class="ttl">The economics<span class="s">Day 2</span></div><div class="last"><b>Inputs:</b> TCO of today's engine, built by finance beforehand; the cost of each direction; cost-to-serve per port call; vendor evaluations. <br><b>Output:</b> One set of numbers everybody accepts — or the specific disagreement about them.</div></div>
+      <div class="row"><div class="no">4</div><div class="ttl">Options and the plan<span class="s">Day 3</span></div><div class="last"><b>Inputs:</b> SWOT finalised; the directions scored against criteria written in block 1; the frozen request queue dispositioned; timelines and budgets drafted. <br><b>Output:</b> The consolidated plan, ready to put in front of ownership.</div></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>The team:</b> strategy · finance · project management (chair). IT and one operations manager per region join for blocks 1 and 2. The pack is read before day 1; no block opens with a presentation longer than twenty minutes.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The tools</div>
+    <h3 class="serif">Standard business models — chosen for what each one answers</h3>
+    <div class="grid g3">
+      <div class="card"><h4>SWOT</h4><div class="sub">Where do we stand?</div><p>Strengths and weaknesses of the engine; opportunities and threats outside it. A starter draft is on the next slide — to be torn up in block 4.</p></div>
+      <div class="card"><h4>Total cost of ownership, 5-year</h4><div class="sub" style="color: var(--green);">What does it really cost?</div><p>Everything the engine consumes: licences, hardware, people, contractors, the hours lost. Today's engine and each option, on the same basis.</p></div>
+      <div class="card"><h4>Cost-to-return and payback</h4><div class="sub" style="color: var(--green);">Is it worth it?</div><p>For each direction: what it costs against what it returns — retention, pricing, new revenue, hours recovered — and when the return overtakes the cost.</p></div>
+      <div class="card"><h4>Build · buy · partner</h4><div class="sub" style="color: var(--green);">Who should do it?</div><p>For each part of the engine: build it ourselves, buy it off the shelf, or partner for it. Accounting already answered this once — Intacct — and it worked.</p></div>
+      <div class="card"><h4>Weighted scoring, criteria first</h4><div class="sub" style="color: var(--amber);">How do we choose fairly?</div><p>The audit's own method: write the criteria before scoring the options, so the answer cannot be fitted to a preference. Block 1 writes them; block 4 scores.</p></div>
+      <div class="card"><h4>Risk register</h4><div class="sub" style="color: var(--amber);">What could go wrong?</div><p>For the chosen direction and for doing nothing — stated as plainly as each other, with owners.</p></div>
+    </div>
+    <div class="foot">No framework is the answer. Each is a way of making sure a question gets asked. The audit's scored rubric is the model — it worked.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">SWOT — starter draft</div>
+    <h3 class="serif">Drawn from what we already hold — block 4 tears it up</h3>
+    <div class="swot">
+      <div class="q s">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Twenty years of agency expertise encoded in the data model — vessel, port call, principal, laycan, berth, cargo</li>
+          <li>A properly built CRM: 8,495 companies, 6,744 contacts, audit-logged</li>
+          <li>A decade of operating data — 507,551 export records — that nobody else holds</li>
+          <li>Customer relationships and the skill of the agents; the engine serves them, not the reverse</li>
+          <li>Accounting already migrated to Intacct by API — the engine can integrate when asked to</li>
+        </ul>
+      </div>
+      <div class="q w">
+        <h4>Weaknesses</h4>
+        <ul>
+          <li>One person able to maintain the engine; no build documentation; no version history</li>
+          <li>No proven restore; live file doubles as the development environment</li>
+          <li>Email on end-of-life hardware; POP scatters the only copy across 2 TB laptops; no archive or hold</li>
+          <li>Reports assembled by hand, sent as attachments, unchanged for years, unmeasured</li>
+          <li>No standards — every office network, every laptop, every request is bespoke</li>
+        </ul>
+      </div>
+      <div class="q o">
+        <h4>Opportunities</h4>
+        <ul>
+          <li>A modern suite lays the foundation in one move: files, archive, shared mailboxes, security</li>
+          <li>Own dock-level data plus public feeds → reports a customer cannot get from USDA or a vendor</li>
+          <li>A sandbox makes change safe for the first time — and makes a second developer possible</li>
+          <li>Purple water: in a market that sets the price, presentation and speed of output are the differentiators left</li>
+          <li>All the material is in one place; the company can, for the first time, describe its own engine</li>
+        </ul>
+      </div>
+      <div class="q t">
+        <h4>Threats</h4>
+        <ul>
+          <li>USDA's free interactive dashboards and commercial data vendors — our reports repeat what they publish</li>
+          <li>Wire-fraud email: a spoofed instruction is the loss that ends relationships</li>
+          <li>One server, one building, Gulf coast, no off-site copy — hurricane season every year</li>
+          <li>The one person leaves, or the contractor's start date arrives with no scope</li>
+          <li>The market sets the price — margin is cost, and every hour of administration is margin given away</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">Every line traces to one of the three assessments or the issues log. Nothing here is new information — it has simply never been on one page.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The directions to score</div>
+    <h3 class="serif">Four directions — safety work first, then they diverge</h3>
+    <div class="rows">
+      <div class="row"><div class="no">A</div><div class="ttl">Stabilise and modernise in place</div><div class="last"><p style="margin:0 0 8px;">Modern email suite; FileMaker rewired in place over 18–30 months; reports refreshed in format but not in kind.</p><p style="margin:0; color:var(--ink-mute); font-size:13px;"><b>Lowest risk.</b> Stays on the blue curve. The audit's platform recommendation — and its honest limit.</p></div></div>
+      <div class="row"><div class="no" style="color:var(--green);">B</div><div class="ttl">Stabilise and pivot the reports</div><div class="last"><p style="margin:0 0 8px;">Same foundation, but the reports become a product: dock-level data the agents already capture, combined with public feeds, delivered on a platform rather than by attachment.</p><p style="margin:0; color:var(--ink-mute); font-size:13px;">The green curve. Needs a product owner from operations and a data path out of FileMaker. Highest return if customers value it — block 2 tells us.</p></div></div>
+      <div class="row"><div class="no">C</div><div class="ttl">Stabilise and buy</div><div class="last"><p style="margin:0 0 8px;">Modern suite plus a commercial agency platform; FileMaker retired over time; reports from the vendor's tooling.</p><p style="margin:0; color:var(--ink-mute); font-size:13px;">Not yet assessed by anyone — the audit says so. Real cost of migration and retraining ~60 staff. Block 3 prices it.</p></div></div>
+      <div class="row"><div class="no" style="color:var(--amber);">D</div><div class="ttl">Stabilise and outsource the run</div><div class="last"><p style="margin:0 0 8px;">Managed service for email, network and desktop; in-house effort concentrated on FileMaker and the reports.</p><p style="margin:0; color:var(--ink-mute); font-size:13px;">Directly addresses the one-person risk. Can combine with A or B. Cheapest to test — a quote.</p></div></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>Not a menu of four.</b> The likely answer combines them — B on top of A's foundation, with D taking the run work. Block 4 scores each part, not each letter.</div>
+    <div class="foot">Scored on cost-to-serve first — the three C's — and on presentation second. The audit scored A–D for the platform alone; this widens the lens to the whole engine.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The calendar</div>
+    <h3 class="serif">Pause now, plan to ownership in November, then execute</h3>
+    <div class="timeline">
+      <div class="tl">
+        <div class="m">Sept (from 17th)</div>
+        <div class="ev pause"><b>Pause</b> Discretionary spend &amp; feature work frozen</div>
+        <div class="ev safe"><b>Safety</b> Logins · quarantine</div>
+        <div class="ev own"><b>Ownership</b> Pause</div>
+      </div>
+      <div class="tl">
+        <div class="m">October</div>
+        <div class="ev safe"><b>Safety</b> Server: install → proven restore → sandbox → off-site copy</div>
+        <div class="ev reset"><b>Reset</b> Board · pack · Customers · TCO</div>
+        <div class="ev work"><b>Working days</b> 3 days</div>
+        <div class="ev plan"><b>Plan</b> Draft plan</div>
+      </div>
+      <div class="tl">
+        <div class="m">November</div>
+        <div class="ev safe"><b>Safety</b> Weekly fix batches through the sandbox · IMAP cleanup · noise filters</div>
+        <div class="ev plan"><b>Plan</b> Present · adjust</div>
+        <div class="ev own"><b>Ownership</b> Review · Sign-off</div>
+      </div>
+      <div class="tl">
+        <div class="m">December</div>
+        <div class="ev pause" style="opacity:.7"><b>Execution</b> on the chosen curve</div>
+      </div>
+      <div class="tl">
+        <div class="m">January</div>
+        <div class="ev pause" style="opacity:.7"><b>Execution</b> continues</div>
+      </div>
+    </div>
+    <div class="foot">Dates are proposals; the only fixed one is the server. If the working days slip, everything after them slips — the pause does not extend on its own.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The risks of pausing</div>
+    <h3 class="serif">Stated as plainly as the risks of not pausing</h3>
+    <div class="rows">
+      <div class="row"><div class="no" style="color:var(--red);">·</div><div class="ttl" style="color:var(--red);">Something breaks while we think</div><div class="last"><p style="margin:0 0 6px;">A server, a mailbox, a report that stops going out.</p><p style="margin:0; color: var(--green);">→ Safety work does not pause. The restore, the sandbox and the off-site copy come first, before the working days.</p></div></div>
+      <div class="row"><div class="no" style="color:var(--red);">·</div><div class="ttl" style="color:var(--red);">The pause becomes permanent</div><div class="last"><p style="margin:0 0 6px;">Two months becomes six; the freeze outlives its purpose.</p><p style="margin:0; color: var(--green);">→ The working days have dates and outputs; sign-off is mid-November. If it slips, the freeze is reviewed, not extended.</p></div></div>
+      <div class="row"><div class="no" style="color:var(--red);">·</div><div class="ttl" style="color:var(--red);">The working days become a complaints forum</div><div class="last"><p style="margin:0 0 6px;">Three days of what is wrong, nothing decided.</p><p style="margin:0; color: var(--green);">→ Materials first; block 1 fixes the facts; a chair; criteria written before options are scored.</p></div></div>
+      <div class="row"><div class="no" style="color:var(--red);">·</div><div class="ttl" style="color:var(--red);">Customers notice the reports decay</div><div class="last"><p style="margin:0 0 6px;">Nothing changes for them during the pause — which is the problem.</p><p style="margin:0; color: var(--green);">→ The customer conversations happen in the reset weeks. That is the first time in years anyone has asked them, and it can only help.</p></div></div>
+      <div class="row"><div class="no" style="color:var(--red);">·</div><div class="ttl" style="color:var(--red);">The one person reads this as a verdict</div><div class="last"><p style="margin:0 0 6px;">The person carrying the engine hears 'diminishing returns' as a judgement.</p><p style="margin:0; color: var(--green);">→ It is the opposite. No one person could hold this, and the wider organisation cannot sustain piecemeal. The plan exists so that nobody has to.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAPTER 2 -->
+<section class="chapter" id="ch2">
+  <div class="wrap">
+    <div class="num">2</div>
+    <div class="body">
+      <div class="kicker">Chapter 2</div>
+      <h2>Agency Platform</h2>
+      <p class="lede">The port call as the pipeline. A concept for the port-call record the audit found missing: eight stages from nomination to settlement, with port operations, accounting and forwarding as parallel tracks.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Why a pipeline</div>
+    <h3 class="serif">Today, and what one record per port call changes</h3>
+    <div class="sc">
+      <div class="col stops">
+        <span class="pill">Today</span>
+        <ul>
+          <li><b>Hundreds of emails a day per agent</b> — orders, confirmations, updates, invoices, all in one inbox</li>
+          <li><b>The port call has no single identity</b> — it lives in a FileMaker record, a mailbox, a spreadsheet and a head, and the audit measured the gap</li>
+          <li><b>Disbursement accounts built by hand</b> — estimate, funding, actuals and settlement in separate places</li>
+          <li><b>Nothing connects</b> — vessel tracking, email, accounting, documents are separate systems</li>
+          <li><b>Tribal knowledge</b> — the critical detail is in someone's memory, not the record</li>
+          <li><b>No visibility for the principal</b> — 'where's my DA?' is a phone call</li>
+        </ul>
+      </div>
+      <div class="col cont">
+        <span class="pill">One record</span>
+        <ul>
+          <li><b>One port call, one status, one screen</b> — every call by stage, port and vessel</li>
+          <li><b>Eight stages, three tracks</b> — port operations, accounting and forwarding each with their own tasks, on the same record</li>
+          <li><b>Checklists generated per call type</b> — assigned, with deadlines; nothing falls through</li>
+          <li><b>The DA tracked live</b> — proforma → funding → actuals → FDA → settlement</li>
+          <li><b>A principal portal</b> — status, FDA approval, funding, documents, without a phone call</li>
+          <li><b>Everything searchable and auditable</b> — nothing lives only in email or a spreadsheet</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">Left column reads the same as the email case, the FileMaker audit and the issues log — because it is the same problem seen from the port call.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The pipeline</div>
+    <h3 class="serif">Eight stages — the whole life of a port call</h3>
+    <div class="pipe">
+      <div class="stage before">1 Nomination<small>Principal nominates; agent quotes; proforma DA born</small></div>
+      <div class="stage before">2 Appointment<small>Confirmed; call exists as a record; funding requested</small></div>
+      <div class="stage before">3 Pre-arrival<small>ETA, pilots, berth, CBP filings, pro forma refined</small></div>
+      <div class="stage call">4 In port<small>Anchor → berth → cargo → complete; SOF builds</small></div>
+      <div class="stage call">5 Departure<small>Outbound pilots, clearance filed, sailing message sent</small></div>
+      <div class="stage close">6 Post-departure<small>Vendor invoices collected and verified; documents issued</small></div>
+      <div class="stage close">7 FDA rendered<small>Final DA compiled, variance shown, rendered to principal</small></div>
+      <div class="stage close">8 FDA settled<small>Principal pays; AR closed; record locked as history</small></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>Why the stages matter more than the screens.</b> A port call with one governed status is what the FileMaker audit found the platform does not have: today a call is 'sailed' when a script moves it, 'billed' when accounting says so, and 'done' when the agent stops thinking about it. Eight named stages, each with an entry and exit condition, give every office, every report and every principal the same answer to 'where is this vessel?' — and every task, cost and document a place to hang.</div>
+    <div class="foot">Stages are the owner's own eight; the March concept used nine. Entry and exit conditions are for the operations managers to write.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Three parallel tracks</div>
+    <h3 class="serif">One record, three tracks running in parallel</h3>
+    <div class="tracks table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th class="before">1 Nom.</th>
+          <th class="before">2 Appt.</th>
+          <th class="before">3 Pre-arr.</th>
+          <th class="call">4 In port</th>
+          <th class="call">5 Dep.</th>
+          <th class="close">6 Post-dep.</th>
+          <th class="close">7 FDA</th>
+          <th class="close">8 Settled</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="ops">
+          <td class="rh">Port Ops</td>
+          <td>Receive nomination; quote; vessel particulars</td>
+          <td>Confirm; open call; berth &amp; terminal liaison</td>
+          <td>ETA/NOR watch; pilots, tugs, linesmen; CBP pre-arrival</td>
+          <td>Anchor, berth, cargo ops, SOF, delays, surveys, crew</td>
+          <td>Outbound pilots; sailing message; SOF sign-off</td>
+          <td>SOF &amp; NOR issued; delay statement; vendor queries</td>
+          <td>Support FDA queries from the principal</td>
+          <td>Call archived; vessel history updated</td>
+        </tr>
+        <tr class="acct">
+          <td class="rh">Accounting</td>
+          <td>Proforma DA: pilotage, towage, dockage, stevedoring, fee</td>
+          <td>Funding request: wire tracked; short-fund alert</td>
+          <td>Proforma refined; vendors' rates confirmed</td>
+          <td>Costs accrue live: estimated → accrued → invoiced</td>
+          <td>Interim funding if burn exceeds balance</td>
+          <td>Invoices verified and approved; variance building</td>
+          <td>FDA compiled; variance report; agency fee; rendered</td>
+          <td>Settlement invoiced; AR aged 30/60/90; paid; closed</td>
+        </tr>
+        <tr class="fwd">
+          <td class="rh">Forwarding</td>
+          <td>Cargo &amp; documentary requirements identified</td>
+          <td>Shipper/receiver contacts; document plan</td>
+          <td>Manifest, entry and export declarations prepared</td>
+          <td>B/Ls, mate's receipts, certificates as cargo works</td>
+          <td>Clearance lodged; B/Ls issued; documents released</td>
+          <td>Certificates, surveys, corrections; FF invoice raised</td>
+          <td>Forwarding charges in the FDA or billed separately</td>
+          <td>Document set archived with the call</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>Same record, three owners, three checklists.</b> A stage cannot close until each track has cleared its exit conditions — that is the whole discipline.</div>
+    <div class="foot">Cell contents are a first draft from the FileMaker file inventory and the March concept; the forwarding track in particular needs the forwarding team to correct it.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Inside stage 4</div>
+    <h3 class="serif">In port is where the record earns its keep</h3>
+    <div class="grid g4 keep-2">
+      <div class="card" style="border-top: 4px solid var(--amber);"><h4>At anchor</h4><p>Waiting for berth. NOR tendered; laytime may start; anchorage costs accrue.</p></div>
+      <div class="card" style="border-top: 4px solid var(--amber);"><h4>Berthed</h4><p>All fast; CBP entry filed; draft survey; dockage begins; crew changes.</p></div>
+      <div class="card" style="border-top: 4px solid var(--amber);"><h4>Working cargo</h4><p>Loading or discharging; SOF building itself; delays logged (weather, breakdown); short-funding alerts.</p></div>
+      <div class="card" style="border-top: 4px solid var(--amber);"><h4>Cargo complete</h4><p>Final draft survey; SOF circulated for signature; outbound pilots ordered; departure prep.</p></div>
+    </div>
+    <h4 style="margin: 28px 0 14px; font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim);">What the record does on its own while the agent is on the dock</h4>
+    <div class="grid g4 keep-2">
+      <div class="card"><h4 style="color: var(--amber);">Task checklist</h4><p>Pre-built per call type — grain, coal, steel, container — assigned to staff with deadlines.</p></div>
+      <div class="card"><h4 style="color: var(--amber);">Expense tracking</h4><p>Every cost line: estimated → accrued → invoice received → verified → approved → paid.</p></div>
+      <div class="card"><h4 style="color: var(--amber);">Timeline / SOF</h4><p>Events logged as they happen; the Statement of Facts assembles itself.</p></div>
+      <div class="card"><h4 style="color: var(--amber);">Funding monitor</h4><p>Running balance against burn rate; alert before the call goes short-funded.</p></div>
+    </div>
+    <div class="foot">The four sub-stages are how every agent already thinks about a call; the record simply names them.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Following the money</div>
+    <h3 class="serif">The disbursement account is the backbone of every call</h3>
+    <div class="rows">
+      <div class="row"><div class="no">1</div><div class="ttl">Proforma DA<span class="s">Stages 1–3</span></div><div class="last">Agent estimates all costs before arrival — pilotage, towage, dockage, stevedoring, agency fee — and sends it to the principal for approval.</div></div>
+      <div class="row"><div class="no">2</div><div class="ttl">Funding request<span class="s">Stages 2–4</span></div><div class="last">Principal wires funds against the estimate. Every receipt tracked; running balance shown; short-funding flagged before it bites.</div></div>
+      <div class="row"><div class="no">3</div><div class="ttl">Live expense tracking<span class="s">Stages 4–6</span></div><div class="last">As vendor invoices arrive, each line moves: estimated → accrued → invoice received → verified → approved → paid.</div></div>
+      <div class="row"><div class="no">4</div><div class="ttl">Final DA<span class="s">Stage 7</span></div><div class="last">All invoices in; actuals compiled; proforma-to-actual variance shown; agency fee calculated; FDA rendered.</div></div>
+      <div class="row"><div class="no">5</div><div class="ttl">Settlement<span class="s">Stage 8</span></div><div class="last">Settlement = FDA less funds received. AR aged 30/60/90; reminders automatic; paid; the record locks.</div></div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>Proforma accuracy becomes a number.</b> Estimate-to-actual trending by port, vessel type and cargo — the audit's 'money trail' answered on every call, not once.</div>
+    <div class="foot">This is the accounting track of the three-track slide, expanded. Intacct remains the ledger; the record feeds it, as FileMaker does today.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The platform at a glance</div>
+    <h3 class="serif">What each track — and the principal — sees</h3>
+    <div class="grid g4 keep-2">
+      <div class="card">
+        <span class="pill blue">Operations</span>
+        <p><b>Port call dashboard</b> — every active call by stage, port, vessel</p>
+        <p><b>Task checklists</b> — generated per call type, assigned, dated</p>
+        <p><b>Timeline / SOF</b> — events logged live; SOF builds itself</p>
+        <p><b>Vessel &amp; organisation registry</b> — particulars, principals, vendors</p>
+      </div>
+      <div class="card">
+        <span class="pill amber">Accounting</span>
+        <p><b>Disbursement accounts</b> — proforma → actuals → FDA, line by line</p>
+        <p><b>Funding &amp; settlement</b> — wires, running balance, settlement invoicing</p>
+        <p><b>AR / AP</b> — aging, vendor payments, principal collections</p>
+        <p><b>Proforma accuracy</b> — estimate vs actual by port, vessel, cargo</p>
+      </div>
+      <div class="card">
+        <span class="pill purple">Forwarding</span>
+        <p><b>Document set per call</b> — manifest, entries, B/Ls, certificates</p>
+        <p><b>Filing status</b> — lodged, accepted, released — per authority</p>
+        <p><b>Forwarding invoices</b> — raised on the call or billed separately</p>
+        <p><b>Cargo &amp; party registry</b> — shippers, receivers, notify parties</p>
+      </div>
+      <div class="card">
+        <span class="pill green">Principal portal</span>
+        <p><b>Port call status</b> — their vessels, current stage, live</p>
+        <p><b>FDA review &amp; approval</b> — approve or query online</p>
+        <p><b>Documents</b> — NOR, SOF, invoices, surveys in one place</p>
+        <p><b>Funding status</b> — wired, owed, settled</p>
+      </div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>Shared:</b> document storage · invoice OCR · search · notifications · audit trail · multi-office — and the reports, read from the same record.</div>
+    <div class="foot">The March concept had three columns; forwarding is added because it is a track of its own in this company.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Where this fits</div>
+    <h3 class="serif">The concept against the FileMaker audit and the working days</h3>
+    <div class="split">
+      <div class="card">
+        <h4>What the audit already established</h4>
+        <ul>
+          <li>The port call has no single identity or governed status — the structural finding behind most others</li>
+          <li>Repeating things are numbered columns (BERTH1…BERTH7) — an eighth berth is a development project</li>
+          <li>The domain model is the asset; the customer module is sound; accounting already left cleanly by API</li>
+          <li>Every direction — stay, strangle, rebuild — starts with the same rewire of the port-call record</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>What this concept adds</h4>
+        <ul>
+          <li>The target shape of that record, in the language of the people who use it — eight stages, three tracks</li>
+          <li>A checklist and DA discipline that can be applied inside FileMaker, in a new build, or in a bought product</li>
+          <li>A principal-facing layer the current platform does not have, and the reports are about to need</li>
+          <li>A scoring basis for directions A–D: which gets closest to this, at what cost to serve</li>
+        </ul>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top: 14px;">
+      <div class="card"><span class="pill blue">Now</span><h4>Foundation</h4><p>Eight-stage workflow · DA management · checklists and timelines · vessel and organisation registry · documents and search</p></div>
+      <div class="card"><span class="pill amber">Next</span><h4>Automation</h4><p>Invoice OCR · principal portal · funding alerts and AR tracking · proforma-accuracy learning · multi-office</p></div>
+      <div class="card"><span class="pill green">Later</span><h4>Intelligence</h4><p>Cost analytics by port, cargo, vessel · fee estimation engine · BlueIQ data integration · mobile for field agents</p></div>
+    </div>
+    <div class="foot">Roadmap tiers from the March concept, re-pointed at Blue Water. Whether the vehicle is FileMaker, a new build or a product is exactly what block 4 decides.</div>
+  </div>
+</section>
+
+<!-- CHAPTER 3 -->
+<section class="chapter" id="ch3">
+  <div class="wrap">
+    <div class="num">3</div>
+    <div class="body">
+      <div class="kicker">Chapter 3</div>
+      <h2>BlueIQ</h2>
+      <p class="lede">One place for all data, all reports. The reports as a product — direction B made concrete. A proven pipeline, re-pointed at Blue Water's own data and Blue Water's own reports.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">What it is</div>
+    <h3 class="serif">Raw records in, every report out</h3>
+    <div class="grid g3">
+      <div class="card">
+        <span class="pill blue">Ingest</span>
+        <h4>Our own data and the public feeds</h4>
+        <ul>
+          <li>FileMaker port calls, vessels, cargo, disbursements</li>
+          <li>Exports master — 507,551 records back to 2016</li>
+          <li>Office lineups, as the clerks record them today</li>
+          <li>CBP entrances and clearances; ocean manifests</li>
+          <li>River traffic (MRTIS), FGIS grain inspections, USDA</li>
+          <li>The vessel register — 52,000 vessels worldwide</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="pill amber">Resolve</span>
+        <h4>One spine, one row per port call</h4>
+        <ul>
+          <li>Deduplicate and clean — the prototype removed 11% junk</li>
+          <li>Enrich from dictionaries: vessel type, agent, port, zone, terminal, cargo</li>
+          <li>Sequence calls into voyages; use draft change to prove load vs discharge</li>
+          <li>Cross-reference the sources by IMO, date and port</li>
+          <li>Lock commodities; run integrity checks after every step</li>
+          <li>Our dock-level data — berth, wait, delay, survey — joins here</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="pill green">Deliver</span>
+        <h4>Every report from the same spine</h4>
+        <ul>
+          <li>Daily elevator lineups — Mississippi River, Texas</li>
+          <li>Weekly, monthly, quarterly and annual export reports</li>
+          <li>Commodity reports — grain, coal, steel, all bulk</li>
+          <li>Port market profiles and agency market share</li>
+          <li>The principal portal — their vessels, live</li>
+          <li>Fee estimation and proforma accuracy</li>
+        </ul>
+      </div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>The difference from today:</b> the reports stop being assembled by hand from FileMaker and sent as attachments. They are generated from one resolved record, and they carry what only we know.</div>
+    <div class="foot">Middle column is the prototype's six-step pipeline; left and right columns are re-pointed at Blue Water's data and Blue Water's reports.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Proven, not proposed</div>
+    <h3 class="serif">The engine behind it was built and run in March 2026</h3>
+    <div class="stats">
+      <div class="stat"><div class="n">91M</div><div class="l">raw data points ingested</div></div>
+      <div class="stat"><div class="n">354K</div><div class="l">port calls resolved — one row each, 341 US ports, 2021–2026</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">federal data sources cross-referenced</div></div>
+      <div class="stat"><div class="n">27,310</div><div class="l">manual cargo corrections preserved in dictionaries, not lost in code</div></div>
+    </div>
+    <div class="rows" style="margin-top: 18px;">
+      <div class="row"><div class="no">1</div><div class="ttl">Raw records come in</div><div class="last">CBP entrance and clearance filings, ocean manifests, river traffic, grain inspection certificates, the vessel register.</div></div>
+      <div class="row"><div class="no">2</div><div class="ttl">Deduplicate and clean</div><div class="last">318K records → 282K after removing 11% junk — duplicates, test entries, incomplete filings.</div></div>
+      <div class="row"><div class="no">3</div><div class="ttl">Enrich from dictionaries</div><div class="last">Eight lookups per record: vessel type, agent roll-up, port normalisation, zone, terminal, cargo class.</div></div>
+      <div class="row"><div class="no">4</div><div class="ttl">Build voyages, calculate cargo</div><div class="last">42,745 voyages sequenced; draft change — physics — decides load versus discharge.</div></div>
+      <div class="row"><div class="no">5</div><div class="ttl">Cross-reference the sources</div><div class="last">River traffic ↔ CBP ↔ manifests linked by IMO, date and port — 19,513 crosswalk links, physics-validated.</div></div>
+      <div class="row"><div class="no">6</div><div class="ttl">Resolve and deliver</div><div class="last">354,302 port calls with traceable cargo, agent, terminal and fee data — ready for reports and dashboards.</div></div>
+    </div>
+    <div class="foot">Prototype built AI-assisted by W. Davis, ~120 hours against an estimated ~2,000 by traditional methods. Figures are the prototype's own; none has yet been run on Blue Water's data.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The architecture</div>
+    <h3 class="serif">Sources → pipeline → spine → products</h3>
+    <div class="grid g3">
+      <div class="card">
+        <h4 style="color: var(--accent);">Data sources</h4>
+        <p><b>FileMaker — Blue Water</b><br>port calls, vessels, cargo, DAs</p>
+        <p><b>Exports master</b><br>507K records, 2016 →</p>
+        <p><b>Office lineups</b><br>as recorded daily</p>
+        <p><b>CBP CF-1400 / 1401</b><br>297K + 288K filings</p>
+        <p><b>Ocean manifests</b><br>661K import + export B/Ls</p>
+        <p><b>MRTIS river traffic</b><br>282K AIS events</p>
+        <p><b>FGIS grain certificates</b><br>129K inspections</p>
+        <p><b>USDA GTR / export sales</b><br>weekly public feeds</p>
+        <p><b>Vessel register</b><br>52K vessels</p>
+      </div>
+      <div class="card">
+        <h4 style="color: var(--amber);">ETL pipeline</h4>
+        <p style="padding:8px 12px; background: color-mix(in srgb, var(--amber) 15%, var(--panel-2)); border-radius: 6px; margin-bottom: 8px;">Ingest &amp; deduplicate</p>
+        <p style="padding:8px 12px; background: color-mix(in srgb, var(--amber) 15%, var(--panel-2)); border-radius: 6px; margin-bottom: 8px;">Dictionary enrichment</p>
+        <p style="padding:8px 12px; background: color-mix(in srgb, var(--amber) 15%, var(--panel-2)); border-radius: 6px; margin-bottom: 8px;">Voyage sequencing</p>
+        <p style="padding:8px 12px; background: color-mix(in srgb, var(--amber) 15%, var(--panel-2)); border-radius: 6px; margin-bottom: 8px;">Draft &amp; cargo calculation</p>
+        <p style="padding:8px 12px; background: color-mix(in srgb, var(--amber) 15%, var(--panel-2)); border-radius: 6px; margin-bottom: 8px;">Cross-reference match</p>
+        <p style="padding:8px 12px; background: color-mix(in srgb, var(--amber) 15%, var(--panel-2)); border-radius: 6px; margin-bottom: 8px;">Commodity lock</p>
+        <p style="padding:8px 12px; background: color-mix(in srgb, #6b7684 20%, var(--panel-2)); border-radius: 6px; margin-bottom: 0;">Integrity checks — 8 groups, every table, every step</p>
+        <p style="font-size: 12px; color: var(--ink-mute); margin-top: 14px;">Idempotent — rerun safely, same result. Non-destructive — raw data never modified. All rules in eight CSV dictionaries, none hard-coded.</p>
+      </div>
+      <div class="card">
+        <div class="band" style="margin: -8px -8px 14px; padding: 16px;">
+          <b>The port-call spine</b>
+          <p style="margin-top: 8px; color: #cfd8e3;">One row per port call — the universal key every table and every report hangs off. Blue Water's own calls join the public record here.</p>
+        </div>
+        <h4 style="color: var(--green);">Intelligence products</h4>
+        <p><b>Daily lineups</b> — Mississippi River, Texas — generated, not assembled</p>
+        <p><b>Export reports</b> — weekly · monthly cumulative · quarterly · annual</p>
+        <p><b>Commodity reports</b> — grain, coal, steel — all major bulk</p>
+        <p><b>Port market profiles</b> — 23 consolidated markets; agency share</p>
+        <p><b>Principal portal</b> — their vessels, their history, live</p>
+        <p><b>Fee estimation</b> — six vessel categories; proforma accuracy</p>
+      </div>
+    </div>
+    <div class="foot">Sources in the left column marked Blue Water are new; the rest ran in the prototype. Product list is the current report inventory, re-pointed at the spine.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">What changes for the reports</div>
+    <h3 class="serif">The same products, produced and delivered differently</h3>
+    <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th></th><th>Today</th><th>With BlueIQ</th></tr></thead>
+      <tbody>
+        <tr><td><b>How they are made</b></td><td class="old">Assembled by hand from FileMaker finds and exports; a morning of a clerk's time per issue</td><td class="new">Generated from the spine on a schedule; the clerk reviews and adds what the dock knows</td></tr>
+        <tr><td><b>Where the data comes from</b></td><td class="old">Our own records only, keyed by hand</td><td class="new">Our own records joined to the public feeds — USDA, CBP, river traffic, manifests</td></tr>
+        <tr><td><b>What they contain</b></td><td class="old">Largely what USDA and the vendors now publish for free</td><td class="new">The public picture plus dock-level fact: berth, wait, delay, survey, the reason</td></tr>
+        <tr><td><b>How they arrive</b></td><td class="old">Email attachment from one sender via a list server</td><td class="new">Portal and email; consistent format; readable on a phone; archived and searchable</td></tr>
+        <tr><td><b>How they look</b></td><td class="old">Unchanged for years</td><td class="new">One design system across every report — the shop window in this decade</td></tr>
+        <tr><td><b>What they cost</b></td><td class="old">Unmeasured hours across every office</td><td class="new">Measured: generation is cheap, review is the agent's judgement; cost to serve falls</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="foot">Row three is the purple-water row: the public picture is table stakes; the dock-level fact is what only an agent can add.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">How it is built</div>
+    <h3 class="serif">Domain expertise drives; AI executes and validates</h3>
+    <div class="grid g3">
+      <div class="card">
+        <span class="pill blue">The stack</span>
+        <p><b>Python, DuckDB, Pandas</b><br><em>analytical database — 91M data points, columnar SQL</em></p>
+        <p><b>Plotly + Leaflet</b><br><em>interactive charts and maps</em></p>
+        <p><b>Git + GitHub</b><br><em>version control — the thing FileMaker never had</em></p>
+        <p><b>CSV · Parquet · JSON</b><br><em>dictionaries, config, intermediate data</em></p>
+      </div>
+      <div class="card">
+        <span class="pill amber">The discipline</span>
+        <p><b>Idempotent ETL</b><br><em>rerun safely, same result every time</em></p>
+        <p><b>Eight dictionaries</b><br><em>all classification rules in CSV — zero hard-coded values</em></p>
+        <p><b>Integrity checks</b><br><em>eight check groups after every step</em></p>
+        <p><b>Non-destructive</b><br><em>raw data never modified; processing adds columns</em></p>
+      </div>
+      <div class="card">
+        <span class="pill green">The method</span>
+        <p><b>AI-assisted development</b><br><em>agents write, debug and refactor; the domain expert reviews, corrects and directs</em></p>
+        <p><b>Human-in-the-loop</b><br><em>27,310 manual cargo edits preserved in dictionaries</em></p>
+        <p><b>Session continuity</b><br><em>39 sessions, context carried across every one</em></p>
+        <p><b>Automated documentation</b><br><em>schema, handoff and state maintained by the pipeline itself</em></p>
+      </div>
+    </div>
+    <div class="stats" style="margin-top: 14px; grid-template-columns: repeat(6, 1fr);">
+      <div class="stat"><div class="n">12,646</div><div class="l">lines of Python</div></div>
+      <div class="stat"><div class="n">40</div><div class="l">scripts</div></div>
+      <div class="stat"><div class="n">23</div><div class="l">tables</div></div>
+      <div class="stat"><div class="n">8</div><div class="l">dictionaries</div></div>
+      <div class="stat"><div class="n">~120 h</div><div class="l">to build, AI-assisted</div></div>
+      <div class="stat green"><div class="n">17×</div><div class="l">faster than traditional</div></div>
+    </div>
+    <div class="foot">Why it matters to the engine: this is the opposite of the FileMaker build — versioned, documented, rule-driven, re-runnable, and not dependent on one person's memory.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">From prototype to Blue Water</div>
+    <h3 class="serif">Pilot on our own data; build only if customers want it</h3>
+    <div class="grid g3">
+      <div class="card"><h4 style="color: var(--accent);">Pilot</h4><div class="sub">Q1 2027 · 8–10 weeks</div>
+        <ul>
+          <li>Blue Water port calls through the six steps; measure the join</li>
+          <li>One report — the Mississippi River lineup — generated end to end</li>
+          <li>Dock-level fields defined with operations; captured on the call</li>
+          <li>Side-by-side with today's version for five customers</li>
+        </ul>
+      </div>
+      <div class="card"><h4 style="color: var(--amber);">Build</h4><div class="sub" style="color: var(--amber);">2027</div>
+        <ul>
+          <li>All export and commodity reports moved onto the spine</li>
+          <li>Design system across every report; portal for principals</li>
+          <li>Scheduled daily pipeline; containerised; cloud hosted</li>
+          <li>Data path out of FileMaker — the audit's Q-003 answered</li>
+        </ul>
+      </div>
+      <div class="card"><h4 style="color: var(--green);">Run</h4><div class="sub" style="color: var(--green);">2028 →</div>
+        <ul>
+          <li>Credentialed access; two-factor; audit trail</li>
+          <li>AI-assisted matching — vessel names, cargo classification</li>
+          <li>Fee estimation and proforma accuracy feeding the DA</li>
+          <li>The shop window becomes a product line — priced or not</li>
+        </ul>
+      </div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>Where it sits in the engine.</b> BlueIQ is direction B: the reports as a product on top of direction A's foundation. It needs three things the pause is already securing — a sandbox to read FileMaker safely, a modern mail and file platform to deliver through, and the customer conversations to prove anyone wants it. None of it starts before block 4.</div>
+    <div class="foot">Pilot scope is deliberately one report and five customers — the cheapest possible test of the purple-water thesis.</div>
+  </div>
+</section>
+
+<!-- CHAPTER 4 -->
+<section class="chapter" id="ch4">
+  <div class="wrap">
+    <div class="num">4</div>
+    <div class="body">
+      <div class="kicker">Chapter 4</div>
+      <h2>Website &amp; Portal</h2>
+      <p class="lede">A first read, and what to review. bluewatershipping.com and the Pilotsheet portal from the outside: what is there, what the security scan says, the customer-access question, and a concept direction for a separate session.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">The website today</div>
+    <h3 class="serif">A 1979 agency's front door, built for the web of 2005</h3>
+    <div class="stats">
+      <div class="stat"><div class="n">6</div><div class="l">regional sections — Pacific, Mississippi River, Mobile, Texas, Norfolk, Baltimore</div></div>
+      <div class="stat"><div class="n">PHP</div><div class="l">one hand-built page per menu item; no content system detected</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">operational links: Pilotsheet (portal) and Locate Vessel</div></div>
+      <div class="stat red"><div class="n">1990</div><div class="l">the year the Technology page still dates the company's platform choice from</div></div>
+    </div>
+    <div class="split" style="margin-top: 18px;">
+      <div class="card">
+        <h4>What a visitor finds</h4>
+        <ul>
+          <li><b>The right message:</b> 24-hour agency at all US ports; bulk grain, oilseeds, fertiliser, steel, ores, coal, pet coke, LNG; forwarding; AMS and eNOA/D</li>
+          <li><b>The right structure:</b> offices, team by region, port maps, port information, weather — an operational site, not a brochure</li>
+          <li><b>The wrong decade:</b> team and 'family' pages, a Mac-network story from 1990, port pages that read as static text — and every one of them maintained by hand</li>
+          <li><b>No route to the shop window:</b> no lineups, no reports, no subscription, no sign-in for a principal — the things customers actually want from us are not here</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Why it belongs in this package</h4>
+        <p>The site is the first thing a prospective principal sees and the only thing most of them ever see. It is also the natural home for the shop window — the lineups, the reports, the portal — once BlueIQ generates them. Today it is maintained the way the reports are: by hand, by one person, in code nobody else can edit. The Trello board already carries 'update website code to Laravel' and 'find a new map for WebDirect', both parked. It is part of the engine, and it should be reviewed with it.</p>
+      </div>
+    </div>
+    <div class="foot">External read of bluewatershipping.com on 18 September 2026 — public pages only; no access to the code or the server.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Security and build — first read</div>
+    <h3 class="serif">Two public endpoints, two grades, two hosts</h3>
+    <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th></th><th>www.bluewatershipping.com</th><th>bluewater.pro — Pilotsheet portal</th></tr></thead>
+      <tbody>
+        <tr><td><b>Security-headers grade</b></td><td class="old">D</td><td class="old">C</td></tr>
+        <tr><td><b>Enforces HTTPS (HSTS)</b></td><td class="old">Missing</td><td class="new">Present — one year, subdomains</td></tr>
+        <tr><td><b>Content Security Policy</b></td><td class="old">Missing</td><td class="old">Missing</td></tr>
+        <tr><td><b>Clickjacking protection</b></td><td class="old">Missing</td><td class="new">Present</td></tr>
+        <tr><td><b>Referrer / permissions policy</b></td><td class="old">Missing</td><td class="old">Missing</td></tr>
+        <tr><td><b>Server advertised</b></td><td>nginx, on a small cloud VPS</td><td>Apache — FileMaker WebDirect behind it; session cookie without SameSite</td></tr>
+        <tr><td><b>Served from</b></td><td>A hosting-provider address</td><td>An office-connection address — production FileMaker Server exposed directly from Metairie (inference)</td></tr>
+        <tr><td><b>Build</b></td><td>Hand-built PHP, page per file, no CMS; 'migrate to Laravel' parked on the board</td><td>FileMaker WebDirect — the same platform the audit describes</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>What this is and is not.</b> A header scan and a read of public pages — the cheapest possible look. It is not a penetration test, and nothing here has been checked against the code or the server. The full audit is the separate session.</div>
+    <div class="foot">Header scans 18 Sep 2026 (securityheaders.com). 'Served from' is inferred from the address block each host resolves to; confirm with IT.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">Customer portal access</div>
+    <h3 class="serif">One door for staff and principals — onto production</h3>
+    <div class="split">
+      <div class="card">
+        <h4>How it works today, as far as the outside can tell</h4>
+        <ul>
+          <li>The website's 'Pilotsheet' link goes to FileMaker WebDirect on bluewater.pro — the production operations file, in a browser</li>
+          <li>The same address appears to serve staff and any customer given a login; there is no separate customer tier</li>
+          <li>The map component is broken and the fix is parked ('find a new map for WebDirect'); the vessel locator is a separate PHP search</li>
+          <li>WebDirect sessions count against server licensing and load — customers browsing compete with agents working</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color: var(--red);">Questions for the working days</h4>
+        <ul>
+          <li>Who has a portal login today — which principals, which staff, and who issues and revokes them?</li>
+          <li>What can a customer see and change? Their own vessels only, or more? Has anyone tested it as a customer?</li>
+          <li>Is the file behind WebDirect the same live file the audit calls the development environment?</li>
+          <li>Is there two-factor, a session limit, an access log — and who reads it?</li>
+        </ul>
+      </div>
+    </div>
+    <div class="band" style="margin-top: 18px;"><b>Where it should end up.</b> The principal portal in chapter 2 and the delivery layer in chapter 3 are the same thing seen from two sides: a customer-facing tier, separate from production, with its own identity and two-factor, showing a principal their vessels, their FDA, their funding and their reports. The website is its front door. Until then, the minimum is to know who holds a key and to put the sandbox rule between them and the live file.</div>
+    <div class="foot">Observations are external; the questions are for IT and operations to answer in block 1. Nothing here has been tested with a login.</div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="kicker">A concept direction</div>
+    <h3 class="serif">The front door to the shop window</h3>
+    <div class="split">
+      <div class="card">
+        <span class="pill green">What it becomes</span>
+        <ul>
+          <li><b>The public face of the service:</b> ports, offices, people, capability — current, phone-first, maintained without a developer</li>
+          <li><b>The front door to the portal:</b> one sign-in, a customer tier separate from production, two-factor</li>
+          <li><b>The shop window, live:</b> lineups, port information, weather and the reports published from BlueIQ, behind sign-in where they should be</li>
+          <li><b>Hosted properly:</b> managed platform, CDN and firewall in front, headers and certificates handled, nothing served from the office line</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="pill blue">The separate session</span>
+        <ul>
+          <li><b>Full external audit:</b> headers, certificates, DNS and mail records, stack, content inventory, accessibility, search visibility</li>
+          <li><b>Portal access review:</b> with IT — who, what, from where, logged how; the WebDirect licensing and load question</li>
+          <li><b>Concept:</b> page map, three or four wireframes, the customer-tier sign-in flow, and a build/buy/host recommendation</li>
+          <li><b>Output:</b> a chapter-4 replacement for this package and a costed line in the plan</li>
+        </ul>
+      </div>
+    </div>
+    <div class="band quiet" style="margin-top: 18px;"><b>For the pause:</b> the website rebuild stays frozen with everything else. The one thing worth doing now is the portal access review — it costs nothing and it is a security question, not a design one.</div>
+    <div class="foot">The website is on the issues list from today: build, security headers, hosting, portal exposure, and the parked Laravel and map items.</div>
+  </div>
+</section>
+
+<!-- Closing -->
+<section class="closing" id="close">
+  <div class="wrap">
+    <div class="kicker" style="font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">What this needs</div>
+    <h2 class="serif">Pause now. A plan in front of ownership by November.</h2>
+    <div class="two">
+      <div>
+        <h3>From the three of us</h3>
+        <div class="pt"><div class="n">1</div><div><b>Three days in October, together</b><p>Strategy, finance and project management in one room with the pack read. Dates fixed this week.</p></div></div>
+        <div class="pt"><div class="n">2</div><div><b>Own a piece each</b><p>Finance builds the TCO and cost-to-serve beforehand. Strategy owns the market block and the customer conversations. Project management owns the pack, the chair and the plan.</p></div></div>
+        <div class="pt"><div class="n">3</div><div><b>One consolidated plan</b><p>Timelines, budgets, owners — presented to ownership in early November, adjusted to their direction, signed off by mid-month.</p></div></div>
+      </div>
+      <div>
+        <h3>From ownership</h3>
+        <div class="pt"><div class="n">1</div><div><b>Agree the pause, effective now</b><p>Discretionary IT spend and new feature work frozen until the plan is signed. Safety work pre-approved and continuing.</p></div></div>
+        <div class="pt"><div class="n">2</div><div><b>The sandbox rule and the logins</b><p>No production FileMaker change outside the sandbox once it exists; the three admin logins handed over this week.</p></div></div>
+        <div class="pt"><div class="n">3</div><div><b>An hour in November</b><p>Review the plan, change what needs changing, sign it off. Four appearances in total across the calendar.</p></div></div>
+      </div>
+    </div>
+    <div class="final"><b>Nothing here commits the company to a vendor, a rebuild or a hire.</b> It commits us to thinking once, together, at the right altitude — before striking ground-level targets again.</div>
+  </div>
+</section>
+
+<footer>
+  Blue Water Shipping — Confidential · September 22, 2026
+</footer>
+
+<script>
+  // Smooth scroll + sticky nav highlight
+  document.querySelectorAll('nav.toc a').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id && id.startsWith('#')) {
+        const target = document.querySelector(id);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.replaceState(null, '', id);
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
