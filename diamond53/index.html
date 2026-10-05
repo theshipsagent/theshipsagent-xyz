@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Diamond 53 — Anatomy of a Grain Load</title>
+<meta name="description" content="A 53,000 DWT Supramax, from general arrangement to grain stability. Cargo gear, cubic capacity, displacement, GM, grain heeling moment and the loading sequence, worked from the vessel's own plans and manuals.">
+<meta property="og:type" content="video.other">
+<meta property="og:title" content="Diamond 53 — Anatomy of a Grain Load">
+<meta property="og:description" content="From GA plan to grain stability: a 53,000 DWT Supramax, worked from her own manuals.">
+<meta property="og:url" content="https://theshipsagent.xyz/diamond53/">
+<meta property="og:image" content="https://theshipsagent.xyz/diamond53/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:video" content="https://theshipsagent.xyz/diamond53/diamond53-grain-load.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1920">
+<meta property="og:video:height" content="1080">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diamond 53 — Anatomy of a Grain Load">
+<meta name="twitter:description" content="From GA plan to grain stability: a 53,000 DWT Supramax, worked from her own manuals.">
+<meta name="twitter:image" content="https://theshipsagent.xyz/diamond53/og.jpg">
+<style>
+  @font-face { font-family: "Raj"; font-weight: 600; src: url(fonts/raj600.woff2) format("woff2"); font-display: swap; }
+  @font-face { font-family: "Raj"; font-weight: 700; src: url(fonts/raj700.woff2) format("woff2"); font-display: swap; }
+  @font-face { font-family: "JBM"; font-weight: 400; src: url(fonts/jbm400.woff2) format("woff2"); font-display: swap; }
+  :root {
+    --bg: #04080f; --bg-2: #071425; --panel: rgba(10, 40, 60, 0.38); --line: rgba(120, 232, 255, 0.18);
+    --ink: #e8f6ff; --ink-dim: #9fb8c8; --cyan: #78e8ff; --amber: #ffb248; --green: #6effaa;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--bg); }
+  body {
+    background: radial-gradient(1200px 600px at 50% -10%, var(--bg-2), var(--bg) 70%) fixed, var(--bg);
+    color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  body::before { /* blueprint grid */
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: linear-gradient(rgba(80,170,220,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(80,170,220,.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
+  .mono { font-family: JBM, ui-monospace, Menlo, monospace; }
+  header.top { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--line); }
+  header.top a { color: var(--ink-dim); text-decoration: none; font-size: 13px; letter-spacing: 1px; }
+  header.top a:hover { color: var(--cyan); }
+  .tag { font-family: JBM, monospace; font-size: 12px; letter-spacing: 2px; color: var(--amber); }
+  .hero { padding: clamp(28px, 6vw, 64px) 0 24px; }
+  h1 { font-family: Raj, sans-serif; font-weight: 700; font-size: clamp(40px, 7vw, 84px); line-height: .95; letter-spacing: .06em; color: var(--cyan); text-shadow: 0 0 24px rgba(120,232,255,.35); }
+  .sub { margin-top: 14px; font-family: JBM, monospace; font-size: clamp(12px, 1.6vw, 15px); letter-spacing: 2px; color: var(--ink-dim); text-transform: uppercase; }
+  .lede { margin-top: 22px; max-width: 760px; font-size: clamp(16px, 1.9vw, 19px); color: #cfe3ef; }
+  .player { position: relative; margin-top: 28px; border: 1px solid var(--line); background: #000; }
+  .player::before, .player::after { content: ""; position: absolute; width: 22px; height: 22px; border-color: var(--cyan); border-style: solid; pointer-events: none; z-index: 2; }
+  .player::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+  .player::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+  video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #000; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 12px; font-family: JBM, monospace; font-size: 12px; color: var(--ink-dim); letter-spacing: 1px; }
+  .meta a { color: var(--cyan); text-decoration: none; }
+  section { padding: clamp(36px, 6vw, 60px) 0 0; }
+  h2 { font-family: Raj, sans-serif; font-weight: 700; font-size: 26px; letter-spacing: 3px; color: var(--cyan); text-transform: uppercase; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  .chapters { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; list-style: none; }
+  .chapters button {
+    width: 100%; text-align: left; cursor: pointer; display: flex; gap: 14px; align-items: baseline;
+    background: var(--panel); border: 1px solid var(--line); color: var(--ink); padding: 12px 14px; font: inherit; transition: border-color .2s, background .2s;
+  }
+  .chapters button:hover, .chapters button:focus-visible { border-color: var(--cyan); background: rgba(20, 70, 100, .45); outline: none; }
+  .chapters .n { font-family: Raj, sans-serif; font-weight: 700; color: var(--amber); font-size: 20px; min-width: 26px; }
+  .chapters .t { font-family: JBM, monospace; font-size: 12px; color: var(--ink-dim); margin-left: auto; }
+  .chapters .l { font-size: 15px; }
+  .grid2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+  table { width: 100%; border-collapse: collapse; font-family: JBM, monospace; font-size: 13.5px; }
+  td { padding: 9px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { color: var(--ink-dim); }
+  td:last-child { text-align: right; color: var(--ink); white-space: nowrap; }
+  tr.hi td:last-child { color: var(--amber); font-weight: 700; }
+  tr.ok td:last-child { color: var(--green); font-weight: 700; }
+  .card { background: var(--panel); border: 1px solid var(--line); padding: 20px 22px; }
+  .card p + p { margin-top: 12px; }
+  .card p { color: #cfe3ef; font-size: 15.5px; }
+  .card strong { color: var(--ink); }
+  footer { margin: 56px 0 0; padding: 22px 0 40px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-dim); }
+  footer p + p { margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a href="/">theshipsagent.xyz</a>
+    <span class="tag">VESSEL ANATOMY · 01</span>
+  </header>
+
+  <div class="hero">
+    <h1>DIAMOND 53</h1>
+    <p class="sub">Anatomy of a grain load · 53,000 DWT geared Supramax</p>
+    <p class="lede">From the general arrangement to the grain stability calculation. Cargo gear, cubic capacity, displacement, GM, grain heeling moment and the loading sequence, all worked from the vessel's own plans and manuals.</p>
+
+    <div class="player">
+      <video id="v" controls playsinline preload="metadata" poster="poster.jpg">
+        <source src="diamond53-grain-load.mp4" type="video/mp4">
+        Your browser can't play this video. <a href="diamond53-grain-load.mp4">Download the MP4</a>.
+      </video>
+    </div>
+    <div class="meta">
+      <span>2:46</span><span>1920 × 1080</span><span>NARRATED · SUBTITLED</span><a href="diamond53-grain-load.mp4" download>DOWNLOAD MP4 ↓</a>
+    </div>
+  </div>
+
+  <section>
+    <h2>Chapters</h2>
+    <ol class="chapters" id="chapters"></ol>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>The numbers</h2>
+      <table>
+        <tr><td>Length overall / LBP</td><td>190.00 / 183.05 m</td></tr>
+        <tr><td>Breadth / depth (moulded)</td><td>32.26 / 17.50 m</td></tr>
+        <tr><td>Cargo gear</td><td>4 × 36 t SWL cranes</td></tr>
+        <tr><td>Grain capacity, 5 holds</td><td>65,752 m³</td></tr>
+        <tr><td>Corn, SF 48 ft³/LT (1.3377 m³/t)</td><td>49,152 t</td></tr>
+        <tr class="hi"><td>Deadweight left unused (cubes out)</td><td>1,972 t</td></tr>
+        <tr><td>Displacement, fresh water ρ 1.000</td><td>62,638 t</td></tr>
+        <tr><td>Drafts aft / mean / fwd</td><td>13.39 / 12.44 / 11.49 m</td></tr>
+        <tr><td>KM − KG (fluid)</td><td>13.68 − 10.66 m</td></tr>
+        <tr class="ok"><td>GM (fluid)</td><td>3.02 m</td></tr>
+        <tr><td>Σ volumetric heeling moment</td><td>3,288 m⁴</td></tr>
+        <tr class="hi"><td>Grain heeling moment / allowable</td><td>2,458 / 46,483 t·m</td></tr>
+        <tr class="ok"><td>Heel · residual area</td><td>0.8° · 0.691 m·rad</td></tr>
+        <tr><td>FWA · rise into sea water</td><td>282 · 273 mm</td></tr>
+      </table>
+    </div>
+    <div>
+      <h2>How it was made</h2>
+      <div class="card">
+        <p>The drawings in the video are the vessel's actual <strong>general arrangement, deck plan and midship section</strong>, re-lit as holograms and scaled at 1:400 so every overlay sits on real frame positions.</p>
+        <p>Every figure comes from her <strong>stability information manual, grain stability manual and cargo loading manual</strong>: hold volumes, lightship, hydrostatics and KN tables, volumetric heeling moments, the maximum allowable heeling moment tables, and the manual's 8-pour homogeneous loading sequence, scaled to corn.</p>
+        <p>The calculation runs in code, the animation is rendered frame by frame from that data, and the narration is synthetic. The light-ballast and first-pour drafts match the manual's figures after correcting for fresh water.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Illustrative only, not for operational use. Corn stowage factor of 48 ft³/LT assumed. Shear force and bending moment during loading are not shown.</p>
+    <p class="mono">theshipsagent.xyz · development &amp; testing</p>
+  </footer>
+</div>
+<script>
+  const CH = [
+    [0.9, 'Underway'], [15.6, 'General arrangement'], [30.2, 'Cargo gear'], [46.4, 'Holds & cubic capacity'], [66.2, 'Cargo quantity'],
+    [86.0, 'Displacement & GM'], [106.0, 'Grain heeling moment'], [127.2, 'Residual stability'], [137.9, 'Loading sequence'], [154.8, 'Fresh water allowance']
+  ];
+  const v = document.getElementById('v'), ol = document.getElementById('chapters');
+  const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  CH.forEach(([t, l], i) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = `<span class="n">${String(i + 1).padStart(2, '0')}</span><span class="l"></span><span class="t">${mmss(t)}</span>`;
+    b.querySelector('.l').textContent = l;
+    b.addEventListener('click', () => { v.currentTime = t; v.play().catch(() => {}); v.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    li.appendChild(b); ol.appendChild(li);
+  });
+</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6e2c2505d1ab45428654ef9a2eb58c7c"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
